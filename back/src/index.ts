@@ -1,8 +1,7 @@
-const num1: number = 5;
-const num2: number = 6;
+import server from "./server";
+import { PORT } from "./config/envs";
 
-const sumar = (a:number,b:number):number => {
-    return a + b;
-}
-
-console.log(sumar(num1,num2));
+server.listen(3000, () => {
+   console.log(`Server listening on port ${PORT}`);
+    
+})
