@@ -34,5 +34,5 @@ export function validateCredential(username: string, password: string): number |
     return credential.id; // Validación exitosa
   }
 
-  return null; // Contraseña incorrecta
+  return null; // Contraseña incorrecta.
 }
