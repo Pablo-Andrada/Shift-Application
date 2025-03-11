@@ -13,7 +13,7 @@ Este proyecto es un sistema de turnos diseñado específicamente para talleres d
 
 - **Frontend**: React, TailwindCSS.
 - **Backend**: Node.js, Express.
-- **Base de Datos**: MongoDB.
+- **Base de Datos**: MongoDB. TypeORM, PostgreSQL.
 
 ## Instrucciones para Iniciar el Proyecto
 
