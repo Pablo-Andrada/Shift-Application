@@ -12,7 +12,7 @@ export const AppDataSource = new DataSource({
     database: "shift_aplication",
     // dropSchema: true,   //esta linea sirve para reiniciar la base de datos, es decir los usuarios y vehicles
     synchronize: true,
-    logging: true,
+    logging: false,
     entities: [User,Appointment,Credential],
     subscribers: [],
     migrations: [],
