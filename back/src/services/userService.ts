@@ -1,62 +1,49 @@
 import { IUser } from '../interfaces/IUser';
 import { createCredential } from './credentialService';
+import UserDto from "../dtos/UserDto";
+import { User } from '../entities/User';
+import { UserModel } from '../config/data-source';
 
-// Precarga de datos
-let users: IUser[] = [
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    birthdate: new Date('1990-01-01'),
-    nDni: '12345678',
-    credentialsId: 1,
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    birthdate: new Date('1985-05-15'),
-    nDni: '87654321',
-    credentialsId: 2,
-  },
-];
+let users: IUser[] = [];
+let id: number = 1;
 
-// Generador de ID único
-let nextUserId = users.length + 1;
+// Función para crear un nuevo usuario
+export const createUserService = async (userData: UserDto): Promise<User> => {
+  const user = await UserModel.create(userData);
+  const result = await UserModel.save(user);
+  return user;
+}
 
-// Función para retornar el arreglo completo de usuarios
-export function getAllUsers(): IUser[] {
+export const getUsersService = async ():Promise<User[]> => {
+  const users = await UserModel.find({
+    relations: {
+      appointments:true
+    }
+  })
   return users;
 }
 
-// Función para retornar un usuario por ID
-export function getUserById(id: number): IUser | null {
-  const user = users.find((user) => user.id === id);
-  return user || null;
+export const getUserByIdService = async(id:number):Promise<User|null> => {
+  const user = await UserModel.findOneBy({ id });
+  return user;
 }
 
-// Función para crear un nuevo usuario
-export function createUserService(
-  name: string,
-  email: string,
-  birthdate: Date,
-  nDni: string,
-  username: string,
-  password: string
-): IUser {
-  // Crear credenciales para el nuevo usuario
-  const credentialsId = createCredential(username, password);
-
-  // Crear nuevo usuario
-  const newUser: IUser = {
-    id: nextUserId++,
-    name,
-    email,
-    birthdate,
-    nDni,
-    credentialsId,
-  };
-
-  users.push(newUser);
-  return newUser;
+export const deleteUserService = async (id:number):Promise<void> => {
+  users = users.filter((user:IUser) => {
+    return user.id !== id;
+  })
 }
+// // Generador de ID único
+// let nextUserId = users.length + 1;
+
+// // Función para retornar el arreglo completo de usuarios
+// export function getAllUsers(): IUser[] {
+//   return users;
+// }
+
+// // Función para retornar un usuario por ID
+// export function getUserById(id: number): IUser | null {
+//   const user = users.find((user) => user.id === id);
+//   return user || null;
+// }
+
