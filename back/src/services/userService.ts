@@ -36,7 +36,7 @@ export function getUserById(id: number): IUser | null {
 }
 
 // Función para crear un nuevo usuario
-export function createUser(
+export function createUserService(
   name: string,
   email: string,
   birthdate: Date,
