@@ -6,4 +6,3 @@ export interface IUser {
     nDni: string; // Número de DNI o identificación
     credentialsId: number; // ID de las credenciales, referencia a otra entidad
   }
-  

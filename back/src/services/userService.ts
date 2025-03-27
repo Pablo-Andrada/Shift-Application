@@ -4,8 +4,8 @@ import UserDto from "../dtos/UserDto";
 import { User } from '../entities/User';
 import { UserModel } from '../config/data-source';
 
-let users: IUser[] = [];
-let id: number = 1;
+// let users: IUser[] = [];
+// let id: number = 1;
 
 // Función para crear un nuevo usuario
 export const createUserService = async (userData: UserDto): Promise<User> => {
@@ -28,11 +28,11 @@ export const getUserByIdService = async(id:number):Promise<User|null> => {
   return user;
 }
 
-export const deleteUserService = async (id:number):Promise<void> => {
-  users = users.filter((user:IUser) => {
-    return user.id !== id;
-  })
+export const deleteUserService = async (id: number): Promise<void> => {
+  await UserModel.delete({ id });
 }
+
+
 // // Generador de ID único
 // let nextUserId = users.length + 1;
 
