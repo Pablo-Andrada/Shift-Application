@@ -4,3 +4,4 @@ interface CredentialDto {
 }
 
 export default CredentialDto;
+

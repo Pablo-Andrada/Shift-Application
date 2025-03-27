@@ -15,17 +15,14 @@ export class User {
     @Column()
     email: string;
     
-    @Column("integer")
-    age: number;
-
     @Column()
     birthdate: Date;
     
     @Column()
-    active: boolean;
+    nDni: string;
 
     @Column()
-    nDni: string;
+    credentialsId: number;
 
     @OneToOne(() => Credential, (credential) => credential.user) 
     @JoinColumn()
