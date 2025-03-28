@@ -18,4 +18,4 @@ appointmentsRouter.get("/:id", getAppointmentIdController);
 appointmentsRouter.post("/schedule", createAppointmentController);
 
 // PUT /appointments/cancel
-appointmentsRouter.put("/cancel", updateAppointmentController);
+appointmentsRouter.put("/cancel/:id", updateAppointmentController);

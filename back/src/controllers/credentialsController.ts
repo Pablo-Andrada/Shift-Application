@@ -15,7 +15,7 @@ export const createCredentialController: RequestHandler = async (req, res) => {
       id: credentialId 
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(404).json({
       message: "Error al crear la credencial",
       error,
     });
@@ -38,7 +38,7 @@ export const validateCredentialController: RequestHandler = async (req, res) => 
       id: credentialId 
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(400).json({
       message: "Error al validar las credenciales",
       error,
     });

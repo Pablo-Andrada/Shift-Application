@@ -6,7 +6,7 @@ import { credentialsRouter } from "./credentialsRouter";
 
 const router: Router = Router()
 
-router.use("/users", usersRouter);
+router.use("/user", usersRouter);
 router.use("/appointments", appointmentsRouter);
 router.use("/credentials", credentialsRouter);
 

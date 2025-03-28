@@ -74,12 +74,12 @@ export const createAppointmentController = async (req: Request, res: Response) =
 };
 
 /**
- * PUT /appointments/cancel
+ * PUT /appointments/cancel/id
  * Cambiar el estatus de un turno a “cancelled”.
  */
 export const updateAppointmentController = async (req: Request, res: Response) => {
   try {
-    const { id } = req.body; // Podrías también recibirlo por URL: /appointments/:id
+    const { id } = req.params; // Podrías también recibirlo por URL: /appointments/:id
 
     const success = await cancelAppointmentService(Number(id));
     if (!success) {

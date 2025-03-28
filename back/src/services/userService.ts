@@ -23,10 +23,18 @@ export const getUsersService = async ():Promise<User[]> => {
   return users;
 }
 
-export const getUserByIdService = async(id:number):Promise<User|null> => {
-  const user = await UserModel.findOneBy({ id });
+// export const getUserByIdService = async(id:number):Promise<User|null> => {
+//   const user = await UserModel.findOneBy({ id });
+//   return user;
+// }
+export const getUserByIdService = async (id: number): Promise<User | null> => {
+  const user = await UserModel.findOne({
+    where: { id },
+    relations: { appointments: true }
+  });
   return user;
 }
+
 
 export const deleteUserService = async (id: number): Promise<void> => {
   await UserModel.delete({ id });

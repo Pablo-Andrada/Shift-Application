@@ -10,7 +10,7 @@ export const createUserController = async (req: Request, res: Response) => {
       const newUser: User = await createUserService({ name, email, birthdate, nDni, credentialsId });
       res.status(201).json(newUser);
     } catch (error) {
-      res.status(500).json({ message: "Error al crear el usuario", error });
+      res.status(400).json({ message: "Error al crear el usuario", error });
     }
 };
   
@@ -26,7 +26,7 @@ export const getUsersController = async (req:Request,res:Response) => {
     const users : User[] = await getUsersService()
     res.status(200).json({users})
    } catch (error) {
-    res.status(500).json({ message: "Error al traer los usuarios", error });
+    res.status(404).json({ message: "Error al traer los usuarios", error });
    }
 }
 //GET /users/:id => Obtener el detalle de un usuario específico.
@@ -36,7 +36,7 @@ export const getUserByIdController = async(req:Request,res:Response) => {
     const user: User | null = await getUserByIdService(Number(id));
     res.status(200).json({ user });
     } catch (error) {
-      res.status(500).json({message:"Usuario inexistente",error})
+      res.status(404).json({message:"Usuario inexistente",error})
     }
   }
 export const deleteUserController= async (req:Request,res:Response) => {
@@ -45,7 +45,7 @@ export const deleteUserController= async (req:Request,res:Response) => {
     await deleteUserService(id);
     res.status(200).json({message: "Usuario eliminado con éxito"})
   } catch (error) {
-    res.status(500).json({message:"Error al borrar usuario",error})
+    res.status(404).json({message:"Error al borrar usuario",error})
   }
 }
 
