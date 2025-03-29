@@ -8,13 +8,16 @@ function NavBar() {
       <h1 className={styles.title}>Taller Mecánica avanzada</h1>
       <ul className={styles.navList}>
         <li className={styles.navItem}>
-          <a href="/" className={styles.navLink}>Inicio</a>
+          <a href="/" className={styles.navLink}>Home</a>
         </li>
         <li className={styles.navItem}>
-          <a href="/appointments" className={styles.navLink}>Turnos</a>
+          <a href="/appointments" className={styles.navLink}>Mis Turnos</a>
         </li>
         <li className={styles.navItem}>
-          <a href="/login" className={styles.navLink}>Login</a>
+          <a href="/about" className={styles.navLink}>About</a>
+        </li>
+        <li className={styles.navItem}>
+          <a href="/contacto" className={styles.navLink}>Contacto</a>
         </li>
       </ul>
     </nav>
