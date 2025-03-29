@@ -1,0 +1,20 @@
+/* 📌 Estilos del componente AppointmentCard */
+
+/* 📌 Estilos para el contenedor principal de la tarjeta */
+.card {
+    border: 1px solid #ccc; /* Agrega un borde sutil */
+    padding: 1rem; /* Espaciado interno para que el contenido no quede pegado */
+    margin-bottom: 1rem; /* Espaciado entre tarjetas si hay varias */
+    border-radius: 4px; /* Bordes redondeados */
+    background-color: #f9f9f9; /* Fondo gris claro */
+  
+    /* Agrega una sombra sutil para resaltar la tarjeta */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* 📌 Opcional: cambiar el color del estado "cancelled" */
+  .card p:last-child {
+    font-weight: bold; /* Hace que el texto sea más grueso */
+    color: #d9534f; /* Rojo para turnos cancelados */
+  }
+  
