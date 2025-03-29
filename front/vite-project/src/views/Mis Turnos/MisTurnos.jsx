@@ -9,7 +9,7 @@ import styles from "./MisTurnos.module.css";
 
 const MisTurnos = () => {
   // Inicializamos el estado con el arreglo de turnos
-  const [appointments] = useState(myAppointments);
+  const [appointments,_setAppointments] = useState(myAppointments);
 
   return (
     <div className={styles.container}>

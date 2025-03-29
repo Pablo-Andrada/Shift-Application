@@ -1,51 +1,106 @@
-/* 📌 Estilos para el contenedor principal de la tarjeta del turno */
+/* AppointmentCard.module.css */
+
+/* Contenedor principal de la tarjeta */
 .card {
-    /* Fondo blanco con un sutil degradado, borde ligero y bordes redondeados */
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1.2rem;
-    margin-bottom: 1rem;
-    
-    /* Sombra sutil para darle profundidad */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    
-    /* Transición para efectos hover */
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
+  background-image: url("../../assets/images/Gestion-de-Turnos.png");
+  position: relative; /* Para posicionar el overlay */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;    
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
   
-  /* Efecto hover: la tarjeta se eleva ligeramente */
-  .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
-  
-  /* 📌 Estilos generales para los párrafos dentro de la tarjeta */
-  .card p {
-    margin: 0.3rem 0;
-    font-size: 0.95rem;
-    color: #333;
-  }
-  
-  /* 📌 Clase para representar el estado del turno */
-  /* Se aplica a un <p> o <span> que muestre el estado */
-  .state {
-    font-weight: bold;
-    padding: 0.3rem 0.6rem;
-    border-radius: 4px;
-    display: inline-block;
-    font-size: 0.9rem;
-  }
-  
-  /* Estilo para turno ACTIVO */
-  .active {
-    background-color: #d4edda; /* fondo verde claro */
-    color: #155724; /* texto verde oscuro */
-  }
-  
-  /* Estilo para turno CANCELADO */
-  .cancelled {
-    background-color: #f8d7da; /* fondo rojo claro */
-    color: #721c24; /* texto rojo oscuro */
-  }
-  
+  /* Aplicamos un overlay blanco semitransparente para que el texto sea legible */
+  overflow: hidden; /* Evitamos que el pseudo-elemento se salga */
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Overlay para mejorar la legibilidad */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Overlay blanco con opacidad: ajusta el valor según necesites */
+  background-color: rgba(255, 255, 255, 0.85);
+  z-index: 0;
+  border-radius: 8px; /* Aseguramos que el overlay respete el borde redondeado */
+}
+
+/* Aseguramos que el contenido de la tarjeta quede por encima del overlay */
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Efecto hover: la tarjeta se eleva ligeramente */
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos generales para los párrafos dentro de la tarjeta */
+.card p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Contenedor para alinear el estado y el botón en una misma línea */
+.statusContainer {
+  display: flex;
+  align-items: center;
+}
+
+/* Clase para representar el estado del turno */
+.state {
+  font-weight: bold;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  display: inline-block;
+  font-size: 0.9rem;
+}
+
+/* Estilo para turno ACTIVO */
+.active {
+  background-color: #d4edda; /* fondo verde claro */
+  color: #155724; /* texto verde oscuro */
+}
+
+/* Estilo para turno CANCELADO */
+.cancelled {
+  background-color: #f8d7da; /* fondo rojo claro */
+  color: #721c24; /* texto rojo oscuro */
+}
+
+/* Estilos para el botón de cancelar turno */
+.cancelButton {
+  background-color: #dc3545; /* rojo para cancelar */ 
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, transform 0.2s;
+  margin-left: 1rem; /* separa el botón del estado */
+}
+
+/* Efecto hover para el botón */
+.cancelButton:hover {
+  background-color: #c82333;
+  transform: scale(1.05);
+}
+
+/* Estilo del botón cuando está deshabilitado */
+.cancelButton:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  transform: none;
+}
+

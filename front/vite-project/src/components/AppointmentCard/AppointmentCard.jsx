@@ -44,6 +44,8 @@ const AppointmentCard = ({ id, date, time, userId, status }) => {
      <p className={`${styles.state} ${status === "active" ? styles.active : styles.cancelled}`}>
         <strong>Estado:</strong> {status}
       </p>
+      {/* Botón para cancelar turno, se deshabilita si el turno ya está cancelado */}
+      <button className={styles.cancelButton} disabled={status=="cancelled"}>Cancelar turno</button>
     </div>
   );
 };
