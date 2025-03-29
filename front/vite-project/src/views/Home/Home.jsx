@@ -7,7 +7,7 @@ function Home() {
   return (
     <div className={styles.homeContainer}>
       {/* NavBar arriba */}
-      <NavBar />
+
       
       {/* Encabezado o contenido principal */}
       <h2 className={styles.title}>
