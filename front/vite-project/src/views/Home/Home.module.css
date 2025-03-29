@@ -1,0 +1,24 @@
+/* src/views/Home/Home.module.css */
+.homeContainer {
+    /* Ocupa al menos todo el alto de la pantalla */
+    min-height: 100vh;
+    
+    /* Aplica la imagen de fondo */
+    background: url("../../assets/images/Imagen-taller-mecanico.jpg") no-repeat center center / cover;
+    
+    /* Podés usar display flex para acomodar contenido */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Título por encima del fondo */
+  .title {
+    color: #fff;
+    font-size: 2rem;
+    margin: 0;
+    /* Un poco de margen superior para no quedar detrás de la NavBar */
+    padding-top: 5rem;
+    padding-left: 2rem;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+  }
+  
