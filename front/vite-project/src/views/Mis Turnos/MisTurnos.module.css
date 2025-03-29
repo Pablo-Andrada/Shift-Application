@@ -1,23 +1,13 @@
-/* src/views/MisTurnos/MisTurnos.module.css */
-
-/* Contenedor principal del componente */
+/* src/views/Turnos/Turnos.module.css */
 .container {
     padding: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
   }
   
-  /* Estilo para el encabezado */
   .header {
     font-size: 2rem;
-    margin-bottom: 1.5rem;
     text-align: center;
-  }
-  
-  /* Estilo para cada tarjeta de turno */
-  .appointmentCard {
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    background-color: #e65353;
+    margin-bottom: 2rem;
   }
   

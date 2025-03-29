@@ -40,7 +40,8 @@ const AppointmentCard = ({ id, date, time, userId, status }) => {
       </p>
 
       {/* Mostramos el estado del turno (activo o cancelado) */}
-      <p>
+     {/* Aquí se aplica la clase dinámica dependiendo del estado */}
+     <p className={`${styles.state} ${status === "active" ? styles.active : styles.cancelled}`}>
         <strong>Estado:</strong> {status}
       </p>
     </div>

@@ -1,20 +1,51 @@
-/* 📌 Estilos del componente AppointmentCard */
-
-/* 📌 Estilos para el contenedor principal de la tarjeta */
+/* 📌 Estilos para el contenedor principal de la tarjeta del turno */
 .card {
-    border: 1px solid #ccc; /* Agrega un borde sutil */
-    padding: 1rem; /* Espaciado interno para que el contenido no quede pegado */
-    margin-bottom: 1rem; /* Espaciado entre tarjetas si hay varias */
-    border-radius: 4px; /* Bordes redondeados */
-    background-color: #f9f9f9; /* Fondo gris claro */
-  
-    /* Agrega una sombra sutil para resaltar la tarjeta */
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    /* Fondo blanco con un sutil degradado, borde ligero y bordes redondeados */
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    
+    /* Sombra sutil para darle profundidad */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    /* Transición para efectos hover */
+    transition: transform 0.2s, box-shadow 0.2s;
   }
   
-  /* 📌 Opcional: cambiar el color del estado "cancelled" */
-  .card p:last-child {
-    font-weight: bold; /* Hace que el texto sea más grueso */
-    color: #d9534f; /* Rojo para turnos cancelados */
+  /* Efecto hover: la tarjeta se eleva ligeramente */
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* 📌 Estilos generales para los párrafos dentro de la tarjeta */
+  .card p {
+    margin: 0.3rem 0;
+    font-size: 0.95rem;
+    color: #333;
+  }
+  
+  /* 📌 Clase para representar el estado del turno */
+  /* Se aplica a un <p> o <span> que muestre el estado */
+  .state {
+    font-weight: bold;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    display: inline-block;
+    font-size: 0.9rem;
+  }
+  
+  /* Estilo para turno ACTIVO */
+  .active {
+    background-color: #d4edda; /* fondo verde claro */
+    color: #155724; /* texto verde oscuro */
+  }
+  
+  /* Estilo para turno CANCELADO */
+  .cancelled {
+    background-color: #f8d7da; /* fondo rojo claro */
+    color: #721c24; /* texto rojo oscuro */
   }
   
