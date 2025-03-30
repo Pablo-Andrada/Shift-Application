@@ -95,7 +95,7 @@ const About = () => {
         {/* Aquí se utiliza un iframe de Google Maps para mostrar la ubicación */}
         <iframe
           title="Ubicación del Taller"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.086954942827!2d-122.40137768468173!3d37.78823877975626!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858064e2435bcd%3A0x1fa1b77c4823a9c3!2sGoogle!5e0!3m2!1ses!2s!4v1616635926757!5m2!1ses!2s"
+          src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d2833.4909395454883!2d-63.869778!3d-31.691721999999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMzHCsDQxJzMwLjIiUyA2M8KwNTInMTEuMiJX!5e1!3m2!1ses!2sar!4v1743356024020!5m2!1ses!2sar"
           width="100%"
           height="300"
           style={{ border: 0 }}
