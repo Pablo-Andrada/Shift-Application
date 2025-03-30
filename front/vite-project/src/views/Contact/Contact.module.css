@@ -1,6 +1,4 @@
-/* src/views/Contacto/Contacto.module.css */
-
-/* Contenedor principal del componente Contacto */
+/* src/views/Contact/Contact.module.css */
 .container {
     max-width: 900px;
     margin: 0 auto;
@@ -9,7 +7,6 @@
     color: #333;
   }
   
-  /* Título principal */
   .title {
     text-align: center;
     font-size: 2.5rem;
@@ -17,7 +14,6 @@
     color: #222;
   }
   
-  /* Estilos para el formulario de contacto */
   .contactForm {
     display: flex;
     flex-direction: column;
@@ -43,7 +39,6 @@
     font-size: 1rem;
   }
   
-  /* Botón de envío del formulario */
   .submitButton {
     align-self: flex-start;
     background-color: #007bff;
@@ -57,44 +52,5 @@
   
   .submitButton:hover {
     background-color: #0056b3;
-  }
-  
-  /* Sección de redes sociales */
-  .socialMedia {
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-  
-  .socialMedia h2 {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-  }
-  
-  .socialList {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-  }
-  
-  .socialList li a {
-    color: #007bff;
-    text-decoration: none;
-    font-size: 1.1rem;
-  }
-  
-  .socialList li a:hover {
-    text-decoration: underline;
-  }
-  
-  /* Sección del mapa */
-  .mapContainer {
-    text-align: center;
-  }
-  
-  .mapContainer h2 {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
   }
   
