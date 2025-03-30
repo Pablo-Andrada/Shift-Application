@@ -22,10 +22,10 @@ interface ContactData {
  */
 export async function sendContactEmail({ name, email, message }: ContactData) {
   const mailOptions = {
-    from: `"Contacto desde Mi Turnero" <${EMAIL_USER}>`,
+    from: `"Contacto desde Turnero Taller Mecánica Avanzada (Shift-Application)" <${EMAIL_USER}>`,
     to: RECEIVER_EMAIL,
     subject: "Nuevo mensaje de contacto",
-    text: `Has recibido un nuevo mensaje desde el formulario de contacto:\n\n` +
+    text: `Has recibido un nuevo mensaje desde el formulario de contacto de Taller Mecánica Avanzada:\n\n` +
           `Nombre: ${name}\n` +
           `Email: ${email}\n\n` +
           `Mensaje:\n${message}`,
