@@ -2,52 +2,64 @@
 
 /* Contenedor principal del About */
 .container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: 'Arial', sans-serif;
-    color: #333;
-  }
-  
-  /* Título principal */
-  .title {
-    font-size: 2.5rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-    color: #222;
-  }
-  
-  /* Contenedor para el carrusel */
-  .carouselWrapper {
-    margin-bottom: 2rem;
-  }
-  
-  /* Contenedor del carrusel */
-  .carouselContainer {
-    position: relative;
-    width: 100%;
-    height: 400px; /* Fija una altura para el carrusel; podés ajustarla según convenga */
-    overflow: hidden;
-    border-radius: 8px;
-  }
-  
-  /* Estilo para la imagen del carrusel */
-  .carouselImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: opacity 0.5s ease-in-out;
-  }
-  
-  /* Contenedor para el contenido textual */
-  .content {
-    font-size: 1rem;
-    line-height: 1.6;
-    text-align: justify;
-  }
-  
-  /* Estilos para cada párrafo del contenido */
-  .content p {
-    margin-bottom: 1rem;
-  }
-  
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+
+/* Título principal */
+.title {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #222;
+}
+
+/* Contenedor para el carrusel */
+.carouselWrapper {
+  margin-bottom: 2rem;
+}
+
+/* Contenedor del carrusel */
+.carouselContainer {
+  position: relative;
+  width: 100%;
+  height: 400px; /* Fija una altura para el carrusel; ajústala según convenga */
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* Estilo para la imagen del carrusel */
+.carouselImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* Contenedor para el contenido textual */
+.content {
+  font-size: 1rem;
+  line-height: 1.6;
+  text-align: justify;
+  margin-bottom: 2rem;
+}
+
+/* Estilos para cada párrafo del contenido */
+.content p {
+  margin-bottom: 1rem;
+}
+
+/* Contenedor para la sección del mapa */
+.mapContainer {
+  margin-top: 2rem;
+}
+
+/* Título para la sección del mapa */
+.mapTitle {
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}

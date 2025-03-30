@@ -4,20 +4,21 @@ import styles from "./About.module.css";
 
 /**
  * ImageCarousel
- * Un componente que muestra una imagen a la vez y la rota automáticamente
- * @param {Object} props - Propiedades del componente
- * @param {Array} props.images - Arreglo de URLs de imágenes a mostrar
- * @param {number} [props.interval=3000] - Intervalo en milisegundos para cambiar la imagen
- * @returns {JSX.Element} El carrusel de imágenes
+ * Componente que muestra una imagen a la vez y la rota automáticamente.
+ * @param {Object} props - Propiedades del componente.
+ * @param {Array} props.images - Arreglo de URLs de imágenes a mostrar.
+ * @param {number} [props.interval=3000] - Intervalo en milisegundos para cambiar la imagen.
+ * @returns {JSX.Element} Carrusel de imágenes.
  */
 const ImageCarousel = ({ images, interval = 3000 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Efecto que actualiza la imagen actual cada 'interval' milisegundos
+  // useEffect que actualiza el índice actual cada 'interval' milisegundos.
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
     }, interval);
+    // Se limpia el timer al desmontar el componente.
     return () => clearInterval(timer);
   }, [images, interval]);
 
@@ -34,10 +35,10 @@ const ImageCarousel = ({ images, interval = 3000 }) => {
 
 /**
  * Componente About
- * Muestra la historia del taller y utiliza un carrusel de imágenes para ilustrar la experiencia
+ * Muestra la historia del taller, un carrusel de imágenes y, al final, un mapa que indica la ubicación del taller.
  */
 const About = () => {
-  // Arreglo de URLs para el carrusel; podes reemplazar estas URLs con las imágenes que prefieras o locales.
+  // Arreglo de URLs para el carrusel (puedes reemplazarlas por imágenes locales o de otro origen)
   const carouselImages = [
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSb5jstQYnIX8hBGROFSPWW34LGWIIKxDodXqGuOJNtqUujKfMv_794lQeiIKVojHXkaG0&usqp=CAU",
     "https://www.clarin.com/2018/01/12/Sy6gg3LNz_312x240__1.jpg",
@@ -86,6 +87,21 @@ const About = () => {
           mundo automotriz, mientras miramos hacia el futuro con ideas frescas y
           proyectos que transforman el sector.
         </p>
+      </div>
+      
+      {/* Sección del mapa que muestra la ubicación del taller */}
+      <div className={styles.mapContainer}>
+        <h2 className={styles.mapTitle}>Nuestra Ubicación</h2>
+        {/* Aquí se utiliza un iframe de Google Maps para mostrar la ubicación */}
+        <iframe
+          title="Ubicación del Taller"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.086954942827!2d-122.40137768468173!3d37.78823877975626!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858064e2435bcd%3A0x1fa1b77c4823a9c3!2sGoogle!5e0!3m2!1ses!2s!4v1616635926757!5m2!1ses!2s"
+          width="100%"
+          height="300"
+          style={{ border: 0 }}
+          allowFullScreen={true}
+          loading="lazy"
+        ></iframe>
       </div>
     </div>
   );
