@@ -3,6 +3,6 @@ import { handleContactForm } from "../controllers/contactController";
 
 export const contactRouter = Router();
 
-contactRouter.post("/contact", handleContactForm);
+contactRouter.post("/", handleContactForm);
 
 export default contactRouter;
