@@ -1,0 +1,85 @@
+/* src/views/Register/Register.module.css */
+
+/* Contenedor principal del formulario de registro */
+.container {
+    max-width: 900px;           /* Limita el ancho del contenedor */
+    margin: 0 auto;             /* Centra el contenedor horizontalmente */
+    padding: 2rem;              /* Espaciado interno para evitar que el contenido quede pegado a los bordes */
+    font-family: Arial, sans-serif; /* Fuente consistente con la app */
+    color: #333;                /* Color general del texto */
+  }
+  
+  /* Título principal */
+  .title {
+    font-size: 2.5rem;          /* Tamaño grande para el título */
+    text-align: center;         /* Centrado horizontal */
+    margin-bottom: 2rem;        /* Espacio inferior para separar el título del formulario */
+    color: #222;                /* Color oscuro para el título */
+  }
+  
+  /* Estilos para el formulario: se organiza en columna con espacio uniforme */
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  /* Grupo de campos del formulario */
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+  
+  /* Etiqueta del input */
+  .formGroup label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Estilo para inputs y textareas */
+  .formGroup input,
+  .formGroup textarea {
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  /* Botón de envío */
+  .submitButton {
+    align-self: center;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  /* Efecto hover para el botón */
+  .submitButton:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Estilos para el mensaje de éxito */
+  .successMessage {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    text-align: center;
+  }
+  
+  /* Estilos para el mensaje de error */
+  .errorMessage {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    text-align: center;
+  }
+  
