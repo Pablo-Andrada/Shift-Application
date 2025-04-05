@@ -37,7 +37,7 @@
     margin-bottom: 0.5rem;
   }
   
-  /* Inputs del formulario: padding, borde y bordes redondeados */
+  /* Estilos para los inputs */
   .formGroup input {
     padding: 0.8rem;
     border: 1px solid #ccc;
@@ -47,22 +47,22 @@
   
   /* Botón de envío del formulario */
   .submitButton {
-    align-self: center;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 0.7rem 1.2rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    align-self: center;         /* Centra el botón horizontalmente */
+    background-color: #007bff;  /* Color azul */
+    color: #fff;                /* Texto blanco */
+    border: none;               /* Sin borde */
+    padding: 0.7rem 1.2rem;      /* Espaciado interno */
+    border-radius: 4px;         /* Bordes redondeados */
+    cursor: pointer;            /* Cursor pointer */
+    transition: background-color 0.2s; /* Transición para hover */
   }
   
-  /* Hover para el botón: tono azul más oscuro */
+  /* Hover para el botón */
   .submitButton:hover {
     background-color: #0056b3;
   }
   
-  /* Mensaje de éxito */
+  /* Estilos para el mensaje de éxito */
   .successMessage {
     background-color: #d4edda;
     color: #155724;
@@ -72,7 +72,7 @@
     text-align: center;
   }
   
-  /* Mensaje de error */
+  /* Estilos para el mensaje de error */
   .errorMessage {
     background-color: #f8d7da;
     color: #721c24;
@@ -80,5 +80,13 @@
     margin-bottom: 1rem;
     border-radius: 4px;
     text-align: center;
+  }
+  
+  /* Estilos para el mensaje informativo cuando el formulario no está completo */
+  .infoMessage {
+    text-align: center;
+    color: #555;
+    font-size: 1rem;
+    margin-top: 1rem;
   }
   

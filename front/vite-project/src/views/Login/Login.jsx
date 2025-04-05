@@ -4,22 +4,24 @@ import styles from "./Login.module.css";
 
 /**
  * Componente Login
- * Muestra un formulario controlado para iniciar sesión, validando que todos los campos estén completos.
- * Al enviar, realiza una petición POST al servidor para el login del usuario y muestra un mensaje de éxito o error.
+ * Muestra un formulario controlado para iniciar sesión.
+ * Solo se muestra el botón de envío cuando ambos campos (username y password) están completos.
  */
 const Login = () => {
-  // Estado para almacenar email y contraseña del usuario.
+  // Estado para almacenar los datos del formulario (username y password).
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: ""
   });
 
   // Estado para almacenar el mensaje de estado (éxito o error).
   const [statusMessage, setStatusMessage] = useState("");
+  // Estado para indicar si el mensaje es de error.
   const [isError, setIsError] = useState(false);
 
   /**
-   * handleChange: Actualiza el estado del formulario cuando el usuario escribe.
+   * handleChange:
+   * Actualiza el estado del formulario cuando el usuario escribe en los inputs.
    * @param {React.ChangeEvent<HTMLInputElement>} e - Evento del input.
    */
   const handleChange = (e) => {
@@ -27,17 +29,18 @@ const Login = () => {
   };
 
   /**
-   * handleSubmit: Se ejecuta al enviar el formulario.
-   * Valida que todos los campos estén completos y realiza una petición POST al servidor.
+   * handleSubmit:
+   * Se ejecuta al enviar el formulario.
+   * Realiza una petición POST al endpoint de login del backend con las credenciales.
    * Muestra un mensaje de éxito o error basado en la respuesta del servidor.
    * @param {React.FormEvent<HTMLFormElement>} e - Evento del formulario.
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { email, password } = formData;
+    const { username, password } = formData;
     
-    // Validación: Verificamos que ambos campos estén completos.
-    if (!email || !password) {
+    // Validación: Verificamos que ambos campos tengan valor.
+    if (!username || !password) {
       setStatusMessage("Por favor complete todos los campos.");
       setIsError(true);
       return;
@@ -45,12 +48,12 @@ const Login = () => {
     
     try {
       // Realiza la petición POST al endpoint de login del backend.
-      const response = await fetch("http://localhost:3000/users/login", {
+      const response = await fetch("http://localhost:3000/credentials/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({ username, password })
       });
-
+      
       const data = await response.json();
 
       // Si la respuesta del servidor no es exitosa, mostramos el mensaje de error.
@@ -70,11 +73,12 @@ const Login = () => {
     }
   };
 
-  // Determinamos si el formulario es válido (ambos campos completos).
-  const isFormValid = formData.email && formData.password;
+  // Se valida que ambos campos tengan valor.
+  const isFormValid = formData.username && formData.password;
 
   return (
     <div className={styles.container}>
+      {/* Título de la vista de login */}
       <h1 className={styles.title}>Iniciar Sesión</h1>
 
       {/* Muestra un mensaje de estado si existe */}
@@ -84,14 +88,15 @@ const Login = () => {
         </div>
       )}
 
+      {/* Formulario controlado para login */}
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
-          <label htmlFor="email">Email:</label>
+          <label htmlFor="username">Nombre de Usuario:</label>
           <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
+            type="text"
+            id="username"
+            name="username"
+            value={formData.username}
             onChange={handleChange}
             required
           />
@@ -107,9 +112,15 @@ const Login = () => {
             required
           />
         </div>
-        <button type="submit" className={styles.submitButton} disabled={!isFormValid}>
-          Iniciar Sesión
-        </button>
+        {/* Solo mostramos el botón si el formulario es válido */}
+        {isFormValid ? (
+          <button type="submit" className={styles.submitButton}>
+            Iniciar Sesión
+          </button>
+        ) : (
+          // Puedes mostrar un mensaje informativo o dejarlo vacío
+          <p className={styles.infoMessage}>Complete ambos campos para iniciar sesión.</p>
+        )}
       </form>
     </div>
   );
