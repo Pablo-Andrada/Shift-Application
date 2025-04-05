@@ -5,19 +5,19 @@
     max-width: 900px;           /* Limita el ancho del contenedor */
     margin: 0 auto;             /* Centra el contenedor horizontalmente */
     padding: 2rem;              /* Espaciado interno para evitar que el contenido quede pegado a los bordes */
-    font-family: Arial, sans-serif; /* Fuente consistente con la app */
-    color: #333;                /* Color general del texto */
+    font-family: Arial, sans-serif;
+    color: #333;
   }
   
-  /* Título principal */
+  /* Título principal del registro */
   .title {
-    font-size: 2.5rem;          /* Tamaño grande para el título */
-    text-align: center;         /* Centrado horizontal */
-    margin-bottom: 2rem;        /* Espacio inferior para separar el título del formulario */
-    color: #222;                /* Color oscuro para el título */
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #222;
   }
   
-  /* Estilos para el formulario: se organiza en columna con espacio uniforme */
+  /* Estilos para el formulario: se organiza en columna con un espacio uniforme */
   .form {
     display: flex;
     flex-direction: column;
@@ -46,7 +46,7 @@
     font-size: 1rem;
   }
   
-  /* Botón de envío */
+  /* Botón de envío del formulario */
   .submitButton {
     align-self: center;
     background-color: #007bff;

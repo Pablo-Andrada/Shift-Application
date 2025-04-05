@@ -4,29 +4,37 @@ import styles from "./Register.module.css";
 
 /**
  * Componente Register
- * Muestra un formulario controlado para el registro de un nuevo usuario.
- * Los datos del formulario se guardan en el estado local, se validan y, al enviarse,
- * se realiza una petición POST al servidor. Se notifica al usuario sobre el resultado.
+ * Este componente muestra un formulario controlado para el registro de un nuevo usuario.
+ * Se espera que el backend reciba un objeto con las siguientes propiedades:
+ *  - name: string
+ *  - email: string
+ *  - birthdate: string (en formato ISO, por ejemplo "1988-07-15T00:00:00.000Z")
+ *  - nDni: string
+ *  - credentialsId: number
+ * 
+ * El formulario valida que todos los campos estén completos. Además, al enviar, convierte
+ * el valor del input de fecha al formato ISO y realiza una petición POST al servidor.
+ * Se notifica al usuario sobre el resultado (éxito o error) mediante un mensaje.
  */
 const Register = () => {
-  // Estado del formulario: se inicializa con valores vacíos para cada campo.
+  // Estado para almacenar los datos del formulario.
+  // Solo incluimos los campos que el backend requiere.
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     birthdate: "",
     nDni: "",
-    username: "",
-    password: "",
-    confirmPassword: ""
+    credentialsId: ""
   });
 
-  // Estado para almacenar el mensaje de estado (éxito o error) y una bandera para diferenciar.
+  // Estado para almacenar el mensaje de estado (éxito o error).
   const [statusMessage, setStatusMessage] = useState("");
+  // Estado para diferenciar entre mensaje de error y éxito.
   const [isError, setIsError] = useState(false);
 
   /**
    * handleChange:
-   * Actualiza el estado del formulario cuando el usuario escribe en un campo.
+   * Actualiza el estado del formulario conforme el usuario escribe en cada campo.
    * @param {React.ChangeEvent<HTMLInputElement>} e - Evento del input.
    */
   const handleChange = (e) => {
@@ -35,56 +43,56 @@ const Register = () => {
 
   /**
    * handleSubmit:
-   * Se ejecuta al enviar el formulario. Valida que todos los campos estén completos
-   * y que las contraseñas coincidan. Luego, realiza una petición POST al servidor.
-   * Muestra un mensaje de éxito o error basado en la respuesta.
+   * Se ejecuta al enviar el formulario.
+   * Valida que todos los campos estén completos, convierte el valor de birthdate
+   * al formato ISO y realiza una petición POST al servidor con los datos del formulario.
+   * Se notifica al usuario sobre el resultado del registro (éxito o error).
    * @param {React.FormEvent<HTMLFormElement>} e - Evento del formulario.
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, birthdate, nDni, username, password, confirmPassword } = formData;
+    const { name, email, birthdate, nDni, credentialsId } = formData;
 
     // Validación: Todos los campos deben estar completos.
-    if (!name || !email || !birthdate || !nDni || !username || !password || !confirmPassword) {
+    if (!name || !email || !birthdate || !nDni || !credentialsId) {
       setIsError(true);
       setStatusMessage("Por favor, complete todos los campos.");
       return;
     }
 
-    // Validación: Las contraseñas deben coincidir.
-    if (password !== confirmPassword) {
-      setIsError(true);
-      setStatusMessage("Las contraseñas no coinciden.");
-      return;
-    }
-
     try {
-      // Realizamos la petición POST al endpoint de registro en el servidor.
-      const response = await fetch("http://localhost:3000/users/register", {
+      // Realizamos la petición POST al endpoint de registro del backend.
+      // NOTA: La URL se ajusta a lo que espera el backend.
+      const response = await fetch("http://localhost:3000/user/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Enviamos los datos del formulario (omitimos confirmPassword)
-        body: JSON.stringify({ name, email, birthdate, nDni, username, password })
+        // Convertimos la fecha al formato ISO (por ejemplo, "1988-07-15T00:00:00.000Z")
+        body: JSON.stringify({
+          name,
+          email,
+          birthdate: new Date(birthdate).toISOString(),
+          nDni,
+          credentialsId: Number(credentialsId)
+        })
       });
       const data = await response.json();
 
+      // Si la respuesta no es exitosa, mostramos un mensaje de error.
       if (!response.ok) {
-        // Si ocurre un error, se notifica con un mensaje de error.
         setIsError(true);
-        setStatusMessage(data.error || "Error al registrar usuario.");
+        setStatusMessage(
+          typeof data.error === "object" ? "Error al registrar usuario." : data.error || "Error al registrar usuario."
+        );
       } else {
-        // Si el registro es exitoso, se muestra un mensaje de éxito.
+        // Registro exitoso: mostramos un mensaje de éxito y limpiamos el formulario.
         setIsError(false);
         setStatusMessage(data.message || "Usuario registrado con éxito.");
-        // Se limpia el formulario.
         setFormData({
           name: "",
           email: "",
           birthdate: "",
           nDni: "",
-          username: "",
-          password: "",
-          confirmPassword: ""
+          credentialsId: ""
         });
       }
     } catch (error) {
@@ -94,26 +102,27 @@ const Register = () => {
     }
   };
 
-  // Variable que determina si el formulario es válido: todos los campos completos y contraseñas iguales.
+  // Se valida que todos los campos tengan valor para habilitar el botón de envío.
   const isFormValid =
     formData.name &&
     formData.email &&
     formData.birthdate &&
     formData.nDni &&
-    formData.username &&
-    formData.password &&
-    formData.confirmPassword &&
-    formData.password === formData.confirmPassword;
+    formData.credentialsId;
 
   return (
     <div className={styles.container}>
+      {/* Título de la vista de registro */}
       <h1 className={styles.title}>Registro</h1>
-      {/* Muestra el mensaje de estado, si existe */}
+
+      {/* Mensaje de estado (éxito o error) */}
       {statusMessage && (
         <div className={isError ? styles.errorMessage : styles.successMessage}>
           {statusMessage}
         </div>
       )}
+
+      {/* Formulario de registro */}
       <form className={styles.form} onSubmit={handleSubmit}>
         {/* Grupo de input para el nombre */}
         <div className={styles.formGroup}>
@@ -163,43 +172,19 @@ const Register = () => {
             required
           />
         </div>
-        {/* Grupo de input para el nombre de usuario */}
+        {/* Grupo de input para el credentialsId */}
         <div className={styles.formGroup}>
-          <label htmlFor="username">Nombre de Usuario:</label>
+          <label htmlFor="credentialsId">ID de Credenciales:</label>
           <input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
+            type="number"
+            id="credentialsId"
+            name="credentialsId"
+            value={formData.credentialsId}
             onChange={handleChange}
             required
           />
         </div>
-        {/* Grupo de input para la contraseña */}
-        <div className={styles.formGroup}>
-          <label htmlFor="password">Contraseña:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        {/* Grupo de input para confirmar la contraseña */}
-        <div className={styles.formGroup}>
-          <label htmlFor="confirmPassword">Confirmar Contraseña:</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        {/* Botón de envío. Se deshabilita hasta que el formulario sea válido */}
+        {/* Botón de envío: se deshabilita hasta que el formulario sea válido */}
         <button type="submit" className={styles.submitButton} disabled={!isFormValid}>
           Registrarse
         </button>
