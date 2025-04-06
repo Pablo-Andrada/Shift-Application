@@ -35,3 +35,14 @@
     text-decoration: underline;
   }
   
+  /* Esto asegura que el botón se vea como un link */
+.navButton {
+  all: unset; /* elimina todos los estilos por defecto del botón */
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.navButton:hover {
+  text-decoration: underline;
+}

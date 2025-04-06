@@ -56,11 +56,12 @@ const NavBar = () => {
         {/* 🔓 Si el usuario está logueado, mostramos botón de cerrar sesión */}
         {user && (
           <li className={styles.navItem}>
-            <button onClick={handleLogout} className={styles.navLink}>
+            <button onClick={handleLogout} className={`${styles.navLink} ${styles.navButton}`}>
               Cerrar sesión
             </button>
           </li>
         )}
+
       </ul>
     </nav>
   );
