@@ -13,3 +13,23 @@
     margin-bottom: 2rem;
   }
   
+  .cancelButton {
+    background-color: #d9534f;
+    color: white;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 5px;
+  }
+  
+  .cancelButton:hover {
+    background-color: #c9302c;
+  }
+  
+  .message {
+    margin-bottom: 10px;
+    color: green;
+    font-weight: bold;
+  }
+  

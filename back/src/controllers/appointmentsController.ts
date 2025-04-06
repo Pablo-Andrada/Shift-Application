@@ -6,7 +6,7 @@ import {
   cancelAppointmentService,
 } from "../services/appointmentService";
 import { Appointment } from "../entities/Appointment";
-
+import { getAppointmentsByUserIdService } from "../services/appointmentService";
 /**
  * GET /appointments
  * Obtener el listado de todos los turnos de todos los usuarios.
@@ -95,26 +95,24 @@ export const updateAppointmentController = async (req: Request, res: Response) =
   }
 };
 
+/**
+ * GET /appointments/user/:userId
+ * Obtener todos los turnos de un usuario específico
+ */
+export const getAppointmentsByUserController = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+
+    // Este servicio debe traerte todos los turnos con ese userId
+    const appointments: Appointment[] = await getAppointmentsByUserIdService(Number(userId));
+
+    res.status(200).json(appointments);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al obtener los turnos del usuario",
+      error,
+    });
+  }
+};
 
 
-
-// import { Request, Response } from "express";
-
-
-// //GET /appointments => Obtener el listado de todos los turnos de todos los usuarios.
-// export const getAppointments = async (req:Request,res:Response) => {
-//     res.status(200).json({message:"Obtener el listado de todos los turnos de todos los usuarios"})
-// }
-
-// //GET /appointments => Obtener el detalle de un turno específico.
-// export const getAppointmentId = async (req: Request, res: Response) => {
-//     res.status(200).json({message:"Obtener el detalle de un turno específico"})
-// }
-// //POST /appointments/schedule => Agendar un nuevo turno.
-// export const createAppointment = async (req:Request,res:Response) => {
-//     res.status(200).json({message:"Agendar un nuevo turno"})
-// }
-// //PUT /appointments/cancel => Cambiar el estatus de un turno a “cancelled”.
-// export const updateAppointment = async (req:Request,res:Response) => {
-//     res.status(200).json({message:"Cambiar el estatus de un turno a “cancelled”"});
-// }

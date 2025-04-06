@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
@@ -11,6 +12,9 @@ import Login from "./views/Login/Login";
 
 // Importamos el componente NavBar, que se mostrará en todas las páginas.
 import NavBar from "./components/NavBar/NavBar";
+
+// Importamos el componente que protege rutas privadas
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 // Importamos ToastContainer de react-toastify y sus estilos para mostrar notificaciones globales.
 import { ToastContainer } from "react-toastify";
@@ -47,7 +51,19 @@ const App = () => {
            Por ejemplo, "/" renderiza el componente Home y "/register" renderiza el componente Register. */ }
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/appointments" element={<MisTurnos />} />
+
+        { /* Ruta protegida: Mis Turnos. Solo accesible si el usuario está logueado.
+             El componente ProtectedRoute (definido en src/components/ProtectedRoute/ProtectedRoute.jsx)
+             se encarga de verificar si hay un usuario en el contexto. */ }
+        <Route
+          path="/appointments"
+          element={
+            <ProtectedRoute>
+              <MisTurnos />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/about" element={<About />} />
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/register" element={<Register />} />

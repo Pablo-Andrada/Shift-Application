@@ -1,15 +1,26 @@
 // src/views/Home/Home.jsx
 import React from "react";
-import NavBar from "../../components/NavBar/NavBar";
 import styles from "./Home.module.css";
+import useUserContext from "../../hooks/useUserContext"; // ✅ Importamos el custom hook del contexto
 
+/**
+ * Componente Home
+ * Muestra el mensaje principal del taller y, si hay un usuario logueado, lo saluda por su nombre.
+ */
 function Home() {
+  // ✅ Obtenemos el usuario actual desde el contexto global
+  const { user } = useUserContext();
+
   return (
     <div className={styles.homeContainer}>
-      {/* NavBar arriba */}
+      {/* ✅ Si hay un usuario logueado, lo saludamos por su nombre */}
+      {user && (
+        <p className={styles.title}>
+          Hola {user.username} 👋 ¡Bienvenido al taller!
+        </p>
+      )}
 
-      
-      {/* Encabezado o contenido principal */}
+      {/* ✅ Encabezado o contenido principal original que ya tenías */}
       <h2 className={styles.title}>
         Taller Automotriz: Mecánica avanzada al instante.
       </h2>
@@ -20,15 +31,4 @@ function Home() {
 export default Home;
 
 
-// import NavBar from "../../components/NavBar/NavBar";
 
-// const Home = () => {
-//     return (
-//         <>
-//             <h1>Taller Automotriz: Mecánica avanzada al instante.</h1>
-//             <NavBar/>
-//         </>
-//     )
-// };
-
-// export default Home;

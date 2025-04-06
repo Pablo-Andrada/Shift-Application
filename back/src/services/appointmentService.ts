@@ -5,12 +5,6 @@ import { Appointment } from "../entities/Appointment";
  * Obtiene todos los turnos (appointments) de la base de datos.
  * Se incluyen las relaciones con el usuario (user) para obtener información completa.
  */
-// export async function getAllAppointmentsService(): Promise<Appointment[]> {
-//   // Buscamos todos los turnos y, opcionalmente, traemos el usuario relacionado
-//   return await AppointmentModel.find({
-//     relations: { user: true }
-//   });
-// }
 export async function getAllAppointmentsService(): Promise<Appointment[]> {
   return await AppointmentModel.find({
     relations: ["user"]
@@ -21,12 +15,6 @@ export async function getAllAppointmentsService(): Promise<Appointment[]> {
  * Obtiene un turno específico por su ID.
  * @param id - El ID del turno.
  */
-// export async function getAppointmentByIdService(id: number): Promise<Appointment | null> {
-//   return await AppointmentModel.findOne({
-//     where: { id },
-//     relations: { user: true } // Incluye el usuario relacionado para verificar que existe
-//   });
-// }
 export async function getAppointmentByIdService(id: number): Promise<Appointment | null> {
   return await AppointmentModel.findOne({
     where: { id },
@@ -87,7 +75,27 @@ export async function cancelAppointmentService(id: number): Promise<boolean> {
   return true;
 }
 
+/**
+ * Obtiene todos los turnos de un usuario específico, usando su ID.
+ * Se incluyen también los datos del usuario (relación con la entidad User).
+ * @param userId - El ID del usuario.
+ * @returns Un arreglo con todos los turnos pertenecientes a ese usuario.
+ */
+export async function getAppointmentsByUserIdService(userId: number): Promise<Appointment[]> {
+  return await AppointmentModel.find({
+    where: {
+      user: {
+        id: userId, // Filtramos los turnos cuyo usuario tenga este ID
+      },
+    },
+    relations: ["user"], // Traemos también los datos del usuario (join)
+  });
+}
 
+
+// -----------------------------------------------------------------------------
+// 👇 Código viejo comentado (respetado tal como me pediste que no lo toque 👇)
+// -----------------------------------------------------------------------------
 
 // import { IAppointment } from '../interfaces/IAppointment';
 
@@ -158,4 +166,3 @@ export async function cancelAppointmentService(id: number): Promise<boolean> {
 //   appointment.status = 'cancelled'; // Cambiar el estado a "cancelled"
 //   return true;
 // }
-

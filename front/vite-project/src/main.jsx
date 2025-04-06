@@ -1,13 +1,30 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'; // Importamos BrowserRouter aquí
-import "./main.css";
-import App from './App.jsx'
+// Importamos React y ReactDOM para renderizar nuestra App
+import React from "react";
+import ReactDOM from "react-dom/client";
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
+// Importamos BrowserRouter para manejar el enrutamiento de la App
+import { BrowserRouter } from "react-router-dom";
+
+// Importamos nuestro componente principal App
+import App from "./App.jsx";
+
+// Importamos el Provider del contexto global de usuario
+import { UserProvider } from "./context/UserContext.jsx";
+
+// Importamos los estilos globales (opcional, si tenés algún CSS global)
+import "./index.css";
+
+// Renderizamos la App dentro del elemento root del HTML
+ReactDOM.createRoot(document.getElementById("root")).render(
+  // React.StrictMode ayuda a detectar problemas potenciales (en desarrollo)
+  <React.StrictMode>
+    {/* BrowserRouter envuelve toda la App para habilitar React Router */}
     <BrowserRouter>
-      <App />
+      {/* UserProvider envuelve toda la App para compartir el estado global del usuario */}
+      <UserProvider>
+        {/* Componente principal de la aplicación */}
+        <App />
+      </UserProvider>
     </BrowserRouter>
-  </StrictMode>
-)
+  </React.StrictMode>
+);

@@ -4,6 +4,7 @@ import {
   getAppointmentIdController,
   createAppointmentController,
   updateAppointmentController,
+  getAppointmentsByUserController,
 } from "../controllers/appointmentsController";
 
 export const appointmentsRouter = Router();
@@ -17,5 +18,8 @@ appointmentsRouter.get("/:id", getAppointmentIdController);
 // POST /appointments/schedule
 appointmentsRouter.post("/schedule", createAppointmentController);
 
-// PUT /appointments/cancel
+// PUT /appointments/cancel/:id
 appointmentsRouter.put("/cancel/:id", updateAppointmentController);
+
+// GET /appointments/user/:userId
+appointmentsRouter.get("/user/:userId", getAppointmentsByUserController);

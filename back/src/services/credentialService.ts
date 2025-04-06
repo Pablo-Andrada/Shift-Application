@@ -1,5 +1,6 @@
 import { CredentialModel } from "../config/data-source";
 import { Credential } from "../entities/Credential";
+import { User } from "../entities/User"; // Importamos la entidad User para poder retornar el objeto usuario
 
 /**
  * Crea un nuevo par de credenciales en la base de datos.
@@ -42,92 +43,43 @@ export async function validateCredential(username: string, password: string): Pr
   // Comparar la contraseña.
   // En producción, reemplazar por bcrypt.compare(password, credential.password)
   if (credential.password === password) {
+    // Validación exitosa: retornamos el ID de la credencial.
     return credential.id;
   }
   
-  // Contraseña incorrecta.
+  // Contraseña incorrecta, retornamos null.
   return null;
 }
 
-
-// import { CredentialModel } from "../config/data-source";
-// import { Credential } from "../entities/Credential";
-
-// // Función para crear un nuevo par de credenciales en la base de datos.
-// // En un caso real, se debería hashear la contraseña (por ejemplo, con bcrypt).
-// export async function createCredential(username: string, password: string): Promise<number> {
-//   // Crear la instancia de Credential usando el repositorio.
-//   const newCredential = CredentialModel.create({
-//     username,
-//     password, // Asegurate de hashear la contraseña en producción.
-//   });
-
-//   // Guardar la credencial en la base de datos.
-//   await CredentialModel.save(newCredential);
+/**
+ * Realiza el proceso de login para las credenciales.
+ * Primero valida las credenciales usando validateCredential.
+ * Si la validación es exitosa, se busca la credencial incluyendo la relación con el usuario,
+ * y se retorna el objeto usuario asociado.
+ * @param username - El nombre de usuario.
+ * @param password - La contraseña.
+ * @returns El objeto usuario si la autenticación es exitosa, o null si falla.
+ */
+export async function loginCredentialService(username: string, password: string): Promise<User | null> {
+  // Validamos las credenciales. Si fallan, retornamos null.
+  const credentialId = await validateCredential(username, password);
   
-//   // Retornar el ID de la nueva credencial.
-//   return newCredential.id;
-// }
-
-// // Función para validar credenciales. Retorna el ID de la credencial si es válida, o null si no lo es.
-// export async function validateCredential(username: string, password: string): Promise<number | null> {
-//   // Buscar la credencial en la base de datos por username.
-//   const credential = await CredentialModel.findOneBy({ username });
+  if (!credentialId) {
+    return null;
+  }
   
-//   if (!credential) {
-//     // Usuario no encontrado.
-//     return null;
-//   }
+  // Buscamos la credencial en la base de datos, incluyendo la relación con el usuario.
+  // Esto nos permite obtener el objeto usuario asociado a estas credenciales.
+  const credential = await CredentialModel.findOne({
+    where: { username },
+    relations: ["user"], // Asegúrate de que la entidad Credential tenga definida la relación con User.
+  });
   
-//   // Comparar la contraseña.
-//   // En producción, usar bcrypt.compare() si la contraseña está hasheada.
-//   if (credential.password === password) {
-//     return credential.id;
-//   }
+  // Si no se encontró la credencial o no hay usuario asociado, retornamos null.
+  if (!credential || !credential.user) {
+    return null;
+  }
   
-//   // Contraseña incorrecta.
-//   return null;
-// }
-
-
-
-
-
-// // import { ICredential } from '../interfaces/ICredential';
-
-// // // Precarga de datos
-// // let credentials: ICredential[] = [
-// //   { id: 1, username: 'user1', password: 'hashedPassword1' },
-// //   { id: 2, username: 'user2', password: 'hashedPassword2' },
-// // ];
-
-// // // Generador de ID único
-// // let nextCredentialId = credentials.length + 1;
-
-// // // Función para crear un nuevo par de credenciales
-// // export function createCredential(username: string, password: string): number {
-// //   const newCredential: ICredential = {
-// //     id: nextCredentialId++,
-// //     username,
-// //     password, // Asegúrate de hashear la contraseña antes de guardarla
-// //   };
-
-// //   credentials.push(newCredential);
-// //   return newCredential.id;
-// // }
-
-// // // Función para validar credenciales
-// // export function validateCredential(username: string, password: string): number | null {
-// //   const credential = credentials.find((cred) => cred.username === username);
-
-// //   if (!credential) {
-// //     return null; // Usuario no encontrado
-// //   }
-
-// //   if (credential.password === password) {
-// //     // Aquí deberías comparar contraseñas usando bcrypt si están hasheadas
-// //     return credential.id; // Validación exitosa
-// //   }
-
-// //   return null; // Contraseña incorrecta.
-// // }
+  // Si todo está bien, retornamos el objeto usuario.
+  return credential.user;
+}
