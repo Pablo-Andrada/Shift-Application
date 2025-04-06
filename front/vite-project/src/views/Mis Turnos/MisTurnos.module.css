@@ -1,35 +1,90 @@
-/* src/views/Turnos/Turnos.module.css */
+/* src/views/Mis Turnos/MisTurnos.module.css */
 
+/* Contenedor principal del componente MisTurnos */
 .container {
-    
-    padding: 1rem;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  
-  .header {
-    font-size: 2rem;
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-  
-  .cancelButton {
-    background-color: #d9534f;
-    color: white;
-    padding: 6px 10px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 5px;
-  }
-  
-  .cancelButton:hover {
-    background-color: #c9302c;
-  }
-  
-  .message {
-    margin-bottom: 10px;
-    color: green;
-    font-weight: bold;
-  }
-  
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Título principal del componente */
+.title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+/* Contenedor para el filtro (select y label) */
+.filterContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Estilo para el label del filtro */
+.filterLabel {
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Estilos para el select de filtro */
+.select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #fff;
+  color: #333;
+}
+
+/* Estilo para el mensaje de carga */
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #777;
+}
+
+/* Estilo para el mensaje de error */
+.error {
+  text-align: center;
+  font-size: 1.2rem;
+  color: red;
+}
+
+/* Lista de turnos */
+.appointmentList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+/* Cada item de la lista de turnos */
+.appointmentItem {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+/* Efecto hover para el item */
+.appointmentItem:hover {
+  transform: translateY(-3px);
+}
+
+/* Mensaje cuando no hay turnos */
+.noAppointments {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #555;
+}

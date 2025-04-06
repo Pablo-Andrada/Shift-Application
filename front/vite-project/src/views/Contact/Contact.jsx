@@ -58,6 +58,7 @@ const Contacto = () => {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Contacto</h1>
+      <h5>Por consultas contactanos al: 3572529573 ó por whatsapp: </h5>
       <form className={styles.contactForm} onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
           <label htmlFor="name">Nombre:</label>

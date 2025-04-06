@@ -1,16 +1,23 @@
 // src/components/NavBar/NavBar.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./NavBar.module.css";
 import useUserContext from "../../hooks/useUserContext";
 
 const NavBar = () => {
-  const { user } = useUserContext();
+  const { user, logoutUser } = useUserContext(); // ⬅️ también traemos logoutUser
+  const navigate = useNavigate();
 
   console.log("📌 Usuario desde NavBar:", user);
 
   // 🚨 Validación: mientras `user` es explícitamente `undefined` (no se cargó contexto todavía), no renderizamos
   if (typeof user === "undefined") return null;
+
+  // Función para cerrar sesión y redirigir al home
+  const handleLogout = () => {
+    logoutUser();       // Cerramos sesión
+    navigate("/");      // Redirigimos a Home
+  };
 
   return (
     <nav className={styles.nav}>
@@ -33,12 +40,27 @@ const NavBar = () => {
         <li className={styles.navItem}>
           <Link to="/contacto" className={styles.navLink}>Contacto</Link>
         </li>
-        <li className={styles.navItem}>
-          <Link to="/register" className={styles.navLink}>Register</Link>
-        </li>
-        <li className={styles.navItem}>
-          <Link to="/login" className={styles.navLink}>Login</Link>
-        </li>
+
+        {/* 🔐 Si el usuario NO está logueado, mostramos login y register */}
+        {!user && (
+          <>
+            <li className={styles.navItem}>
+              <Link to="/register" className={styles.navLink}>Register</Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link to="/login" className={styles.navLink}>Login</Link>
+            </li>
+          </>
+        )}
+
+        {/* 🔓 Si el usuario está logueado, mostramos botón de cerrar sesión */}
+        {user && (
+          <li className={styles.navItem}>
+            <button onClick={handleLogout} className={styles.navLink}>
+              Cerrar sesión
+            </button>
+          </li>
+        )}
       </ul>
     </nav>
   );
