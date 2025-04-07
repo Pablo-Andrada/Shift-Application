@@ -10,6 +10,8 @@ import App from "./App.jsx";
 
 // Importamos el Provider del contexto global de usuario
 import { UserProvider } from "./context/UserContext.jsx";
+// Importamos el Provider del contexto global de appointment
+import { AppointmentProvider} from "./context/AppointmentContext.jsx";
 
 // Importamos los estilos globales (opcional, si tenés algún CSS global)
 import "./index.css";
@@ -22,8 +24,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       {/* UserProvider envuelve toda la App para compartir el estado global del usuario */}
       <UserProvider>
-        {/* Componente principal de la aplicación */}
-        <App />
+        {/* AppointmentProvider envuelve toda la App para compartir el estado global del usuario */}
+        <AppointmentProvider>
+          {/* Componente principal de la aplicación */}
+          <App />
+        </AppointmentProvider>
       </UserProvider>
     </BrowserRouter>
   </React.StrictMode>

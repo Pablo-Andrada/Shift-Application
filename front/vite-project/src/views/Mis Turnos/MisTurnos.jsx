@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import styles from "./MisTurnos.module.css";
 // Importamos el hook de contexto para acceder al usuario logueado
 import useUserContext from "../../hooks/useUserContext";
+// Importamos el componente AppointmentCard para mostrar cada turno
+import AppointmentCard from "../../components/AppointmentCard/AppointmentCard";
 
 /**
  * Componente MisTurnos
@@ -20,7 +22,6 @@ const MisTurnos = () => {
   const [error, setError] = useState(null);
   // Estado para saber si estamos cargando los turnos
   const [loading, setLoading] = useState(true);
-
   // Nuevo estado para el filtro de estado
   const [filterStatus, setFilterStatus] = useState("todos");
 
@@ -36,11 +37,9 @@ const MisTurnos = () => {
     const fetchAppointments = async () => {
       try {
         const response = await fetch(`http://localhost:3000/appointments/user/${user.id}`);
-
         if (!response.ok) {
           throw new Error("No se pudieron obtener los turnos.");
         }
-
         const data = await response.json();
         setAppointments(data); // Guardamos los turnos en el estado
         setError(null);        // Limpiamos cualquier error previo
@@ -68,6 +67,36 @@ const MisTurnos = () => {
     filterStatus === "todos"
       ? appointments
       : appointments.filter((appt) => appt.status === filterStatus);
+
+  /**
+   * handleCancel:
+   * Función para cancelar un turno.
+   * Realiza la petición al backend para cancelar el turno y actualiza el estado de turnos.
+   * @param {number} id - ID del turno a cancelar.
+   */
+  const handleCancel = async (id) => {
+    // Preguntamos al usuario si realmente quiere cancelar el turno
+    const confirm = window.confirm("¿Estás seguro que querés cancelar este turno?");
+    if (!confirm) return;
+
+    try {
+      const response = await fetch(`http://localhost:3000/appointments/cancel/${id}`, {
+        method: "PUT",
+      });
+      if (!response.ok) {
+        throw new Error("No se pudo cancelar el turno.");
+      }
+      // Actualizamos el estado: marcamos el turno como 'cancelled'
+      setAppointments((prevAppointments) =>
+        prevAppointments.map((appt) =>
+          appt.id === id ? { ...appt, status: "cancelled" } : appt
+        )
+      );
+    } catch (err) {
+      console.error("Error al cancelar turno:", err.message);
+      setError(err.message);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -97,17 +126,22 @@ const MisTurnos = () => {
       {!loading && !error && filteredAppointments.length > 0 ? (
         <ul className={styles.appointmentList}>
           {filteredAppointments.map((appt) => (
-            <li key={appt.id} className={styles.appointmentItem}>
-              <strong>Fecha:</strong> {new Date(appt.date).toLocaleDateString()} <br />
-              <strong>Hora:</strong> {appt.time} <br />
-              <strong>Servicio:</strong> {appt.service || "N/A"} <br />
-              <strong>Estado:</strong> {appt.status}
-            </li>
+            // Pasamos handleCancel como prop para que se ejecute al hacer clic en el botón de cancelar
+            <AppointmentCard
+              key={appt.id}
+              id={appt.id}
+              date={appt.date}
+              time={appt.time}
+              userId={appt.userId}
+              status={appt.status}
+              onCancel={handleCancel}
+            />
           ))}
         </ul>
       ) : (
-        !loading &&
-        !error && <p className={styles.noAppointments}>No hay turnos que coincidan con el filtro seleccionado.</p>
+        !loading && !error && (
+          <p className={styles.noAppointments}>No hay turnos que coincidan con el filtro seleccionado.</p>
+        )
       )}
     </div>
   );
