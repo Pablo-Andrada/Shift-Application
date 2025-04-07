@@ -11,6 +11,7 @@ import useUserContext from "../../hooks/useUserContext";
  *   - date: la fecha seleccionada, convertida a formato ISO
  *   - time: la hora seleccionada, formateada a formato 12 horas (AM/PM)
  *   - status: se establece por defecto en "active"
+ *
  * Si la creación es exitosa, se ejecuta onSuccess para actualizar la UI y se cierra el modal mediante onClose.
  *
  * @param {function} onClose - Función para cerrar el modal.
@@ -38,7 +39,7 @@ const CreateAppointment = ({ onClose, onSuccess }) => {
   /**
    * formatTimeDisplay:
    * Convierte la hora en formato 24 horas ("HH:MM") a un formato 12 horas con AM/PM.
-   * Por ejemplo, "13:30" se convierte en "1:30 PM".
+   * Ejemplo: "13:30" se convierte en "1:30 PM".
    * @param {string} timeStr - La hora en formato "HH:MM".
    * @returns {string} La hora formateada.
    */
@@ -55,7 +56,8 @@ const CreateAppointment = ({ onClose, onSuccess }) => {
    * Envía una petición POST al backend para crear un nuevo turno.
    * No se envía el id, ya que éste lo genera el backend.
    * Se envían: userId (del contexto), date (formateada a ISO), time (formateada a 12h) y status ("active").
-   * Si la creación es exitosa, se ejecuta onSuccess y se cierra el modal con onClose.
+   * Si la creación es exitosa, se ejecuta onSuccess para actualizar la lista de turnos en el componente padre
+   * y se cierra el modal mediante onClose.
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,12 +67,13 @@ const CreateAppointment = ({ onClose, onSuccess }) => {
     try {
       // Construimos el objeto a enviar al backend
       const appointmentData = {
-        date: buildDateTime(date, time),          // Fecha con hora en formato ISO
-        time: formatTimeDisplay(time),            // Hora en formato 12h (ej: 11:00 AM)
+        date: buildDateTime(date, time),          // Fecha y hora en formato ISO
+        time: formatTimeDisplay(time),            // Hora en formato 12h (ej: "11:00 AM")
         userId: user.id,                          // ID del usuario logueado
         status: "active",                         // Estado inicial del turno
       };
 
+      // Realizamos la petición POST al endpoint de creación de turnos
       const response = await fetch("http://localhost:3000/appointments/schedule", {
         method: "POST",
         headers: {
@@ -84,10 +87,10 @@ const CreateAppointment = ({ onClose, onSuccess }) => {
       }
 
       const data = await response.json();
-
-      // ✅ El backend devuelve el turno creado, incluyendo su id y los datos del usuario
-      onSuccess(data);  // Actualizar la lista de turnos en el componente padre
-      onClose();        // Cerrar el modal
+      // Llamamos a onSuccess para actualizar la lista de turnos en el componente padre
+      onSuccess(data);
+      // Cerramos el modal mediante onClose
+      onClose();
     } catch (err) {
       console.error("Error al crear turno:", err);
       setError(err.message);
@@ -101,32 +104,32 @@ const CreateAppointment = ({ onClose, onSuccess }) => {
       <div className={styles.modalContent}>
         <h3>Crear Nuevo Turno</h3>
         <form onSubmit={handleSubmit} className={styles.form}>
-          <label>
-            Fecha:
+          <div className={styles.formGroup}>
+            <label>Fecha:</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
             />
-          </label>
-          <label>
-            Hora:
+          </div>
+          <div className={styles.formGroup}>
+            <label>Hora:</label>
             <input
               type="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
               required
             />
-          </label>
+          </div>
 
           {error && <p className={styles.error}>{error}</p>}
 
-          <div className={styles.buttons}>
-            <button type="button" onClick={onClose} disabled={submitting}>
+          <div className={styles.buttonContainer}>
+            <button type="button" onClick={onClose} disabled={submitting} className={styles.cancelButton}>
               Cancelar
             </button>
-            <button type="submit" disabled={submitting}>
+            <button type="submit" disabled={submitting} className={styles.saveButton}>
               {submitting ? "Guardando..." : "Crear"}
             </button>
           </div>

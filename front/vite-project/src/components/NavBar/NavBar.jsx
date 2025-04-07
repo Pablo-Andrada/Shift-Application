@@ -35,10 +35,10 @@ const NavBar = () => {
         )}
 
         <li className={styles.navItem}>
-          <Link to="/about" className={styles.navLink}>About</Link>
+          <Link to="/contacto" className={styles.navLink}>Contacto</Link>
         </li>
         <li className={styles.navItem}>
-          <Link to="/contacto" className={styles.navLink}>Contacto</Link>
+          <Link to="/about" className={styles.navLink}>About</Link>
         </li>
 
         {/* 🔐 Si el usuario NO está logueado, mostramos login y register

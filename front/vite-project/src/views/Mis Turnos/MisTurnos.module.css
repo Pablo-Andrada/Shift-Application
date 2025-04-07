@@ -1,41 +1,149 @@
+/* Contenedor principal del componente MisTurnos */
+.container {
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Título principal del componente */
+.title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+/* Contenedor para el filtro (select, label) y el botón “+ Nuevo Turno” */
+.filterContainer {
+  display: flex;              /* Alineación en fila */
+  align-items: center;        /* Centrado vertical */
+  justify-content: center;    /* Centrado horizontal */
+  gap: 0.75rem;               /* Espacio entre elementos */
+  margin-bottom: 1.5rem;      /* Separación con el contenido siguiente */
+}
+
+/* Estilo para el label del filtro */
+.filterLabel {
+  font-size: 1rem;
+  color: #555;
+  font-weight: 500;
+}
+
+/* Estilos para el select de filtro */
+.select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #fff;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.select:focus {
+  border-color: #007bff; /* Color al hacer foco */
+}
+
 /* Botón para crear nuevo turno */
 .createButton {
-  background-color: #28a745;
-  color: white;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
+  background-color: #28a745;  /* Verde para el botón */
+  color: #fff;
   border: none;
-  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.2s;
 }
 
 .createButton:hover {
-  background-color: #218838;
+  background-color: #218838;  /* Verde más oscuro al hacer hover */
+  transform: scale(1.02);     /* Efecto leve de agrandado */
 }
 
-/* Modal de fondo */
+/* Estilo para el mensaje de carga */
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #777;
+}
+
+/* Estilo para el mensaje de error */
+.error {
+  text-align: center;
+  font-size: 1.2rem;
+  color: red;
+}
+
+/* Lista de turnos */
+.appointmentList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+/* Cada item de la lista de turnos */
+.appointmentItem {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.appointmentItem:hover {
+  transform: translateY(-3px);
+}
+
+/* Mensaje cuando no hay turnos */
+.noAppointments {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* ----------------------------- */
+/* ESTILOS PARA EL MODAL NUEVO TURNO */
+/* ----------------------------- */
+
+/* Fondo del modal que cubre toda la pantalla */
 .modalBackdrop {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Oscurece el fondo */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
-/* Contenido del modal */
+/* Contenedor del modal */
 .modal {
-  background: white;
-  padding: 2rem;
+  background-color: #fff;
+  padding: 1.5rem;
   border-radius: 8px;
   max-width: 400px;
-  width: 100%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Título del modal */
+.modal h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #333;
 }
 
 /* Formulario dentro del modal */
@@ -45,26 +153,61 @@
   gap: 1rem;
 }
 
-/* Botones dentro del modal */
+/* Etiquetas de los campos */
+.form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+/* Inputs del formulario */
+.form input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+/* Contenedor de botones del modal */
 .modalActions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
 
-.modalActions button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
+/* Botón Guardar */
 .modalActions button[type="submit"] {
   background-color: #007bff;
-  color: white;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s, transform 0.2s;
 }
 
+.modalActions button[type="submit"]:hover {
+  background-color: #0056b3;
+  transform: scale(1.03);
+}
+
+/* Botón Cancelar */
 .modalActions button[type="button"] {
-  background-color: #dc3545;
-  color: white;
+  background-color: #ccc;
+  color: #333;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.modalActions button[type="button"]:hover {
+  background-color: #aaa;
+  transform: scale(1.03);
 }
