@@ -1,85 +1,88 @@
 /* src/views/Register/Register.module.css */
 
-/* Contenedor principal del formulario de registro */
 .container {
-    max-width: 900px;           /* Limita el ancho del contenedor */
-    margin: 0 auto;             /* Centra el contenedor horizontalmente */
-    padding: 2rem;              /* Espaciado interno para evitar que el contenido quede pegado a los bordes */
-    font-family: Arial, sans-serif;
-    color: #333;
-  }
+  position: fixed !important;       /* Forzamos que el contenedor se posicione como modal */
+  top: 50% !important;              /* Centrado vertical */
+  left: 50% !important;             /* Centrado horizontal */
+  transform: translate(-50%, -50%) !important; /* Ajuste para el centrado exacto */
   
-  /* Título principal del registro */
-  .title {
-    font-size: 2.5rem;
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #222;
-  }
-  
-  /* Estilos para el formulario: se organiza en columna con un espacio uniforme */
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  /* Grupo de campos del formulario */
-  .formGroup {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 1rem;
-  }
-  
-  /* Etiqueta del input */
-  .formGroup label {
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-  }
-  
-  /* Estilo para inputs y textareas */
-  .formGroup input,
-  .formGroup textarea {
-    padding: 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  
-  /* Botón de envío del formulario */
-  .submitButton {
-    align-self: center;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 0.7rem 1.2rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  /* Efecto hover para el botón */
-  .submitButton:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Estilos para el mensaje de éxito */
-  .successMessage {
-    background-color: #d4edda;
-    color: #155724;
-    padding: 0.8rem;
-    margin-bottom: 1rem;
-    border-radius: 4px;
-    text-align: center;
-  }
-  
-  /* Estilos para el mensaje de error */
-  .errorMessage {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 0.8rem;
-    margin-bottom: 1rem;
-    border-radius: 4px;
-    text-align: center;
-  }
-  
+  width: 90% !important;            /* Ocupa 90% del ancho en dispositivos pequeños */
+  max-width: 400px !important;      /* Ancho máximo de 400px en dispositivos grandes */
+  padding: 1.5rem !important;       /* Espaciado interno */
+  background-color: #fff !important;/* Fondo blanco */
+  border-radius: 8px !important;    /* Bordes redondeados */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* Sombra sutil */
+  z-index: 9999 !important;         /* Se asegura que esté por encima */  
+}
+
+/* Título del formulario */
+.title {
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+/* Estilos para el formulario */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Grupo de inputs */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Etiquetas */
+.formGroup label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+/* Inputs */
+.formGroup input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+/* Mensajes */
+.successMessage {
+  text-align: center;
+  color: green;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.errorMessage {
+  text-align: center;
+  color: red;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+/* Botón de envío */
+.submitButton {
+  padding: 0.7rem 1.2rem;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover {
+  background-color: #0056b3;
+}
+
+.submitButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

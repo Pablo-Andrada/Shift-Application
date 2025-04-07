@@ -9,6 +9,7 @@ import About from "./views/About/About";
 import Contacto from "./views/Contact/Contact";
 import Register from "./views/Register/Register";
 import Login from "./views/Login/Login";
+import CreateAppointment from "./components/CreateAppointment/CreateAppointment"; // 👈 NUEVA IMPORTACIÓN
 
 // Importamos el componente NavBar, que se mostrará en todas las páginas.
 import NavBar from "./components/NavBar/NavBar";
@@ -60,6 +61,17 @@ const App = () => {
           element={
             <ProtectedRoute>
               <MisTurnos />
+            </ProtectedRoute>
+          }
+        />
+
+        { /* Ruta protegida: Crear Turno. Solo accesible si el usuario está logueado.
+             Utiliza el mismo componente ProtectedRoute que la sección de Mis Turnos. */ }
+        <Route
+          path="/crear-turno"
+          element={
+            <ProtectedRoute>
+              <CreateAppointment />
             </ProtectedRoute>
           }
         />

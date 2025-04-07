@@ -5,21 +5,35 @@ import {
   getUsersService,
   getUserByIdService,
   deleteUserService,
-  getUserByCredentialIdService // Asegurate de tener esta función en userService.ts
+  getUserByCredentialIdService
 } from "../services/userService";
-import { validateCredential } from "../services/credentialService"; // Función que valida credenciales y retorna el ID si es válida
+import { validateCredential, createCredential } from "../services/credentialService"; // Importamos createCredential
 import { User } from "../entities/User";
 
 /**
  * POST /users/register => Registro de un nuevo usuario.
- * Recibe del body: name, email, birthdate, nDni y credentialsId.
- * Crea un nuevo usuario y devuelve el objeto creado.
+ * Recibe del body: name, email, birthdate, nDni y password.
+ * Primero crea las credenciales usando el password y luego crea el usuario utilizando el ID de las credenciales generadas.
+ * Retorna el objeto usuario creado.
  */
 export const createUserController = async (req: Request, res: Response) => {
-  const { name, email, birthdate, nDni, credentialsId } = req.body;
+  // Extraemos los datos necesarios del body; ahora se espera que el campo "password" esté presente.
+  const { name, email, birthdate, nDni, password } = req.body;
+  
+  // Validación básica para asegurarnos de que se envíe el password.
+  if (!password) {
+    return res.status(400).json({ message: "El campo 'password' es obligatorio." });
+  }
   
   try {
-    const newUser: User = await createUserService({ name, email, birthdate, nDni, credentialsId });
+    // Primero, creamos las credenciales utilizando el email y el password.
+    // La función createCredential se encargará de hashear la contraseña en producción y retornar el ID generado.
+    const credentialId = await createCredential(email, password);
+    
+    // Luego, creamos el usuario utilizando el credentialId generado.
+    const newUser: User = await createUserService({ name, email, birthdate, nDni, credentialsId: credentialId });
+    
+    // Retornamos el usuario creado.
     res.status(201).json(newUser);
   } catch (error) {
     res.status(400).json({ message: "Error al crear el usuario", error });
@@ -74,32 +88,24 @@ export const deleteUserController = async (req: Request, res: Response) => {
  */
 export const createLogin = async (req: Request, res: Response) => {
   try {
-    // Extraemos username y password del body.
     const { username, password } = req.body;
 
-    // Validamos que ambos campos estén presentes.
     if (!username || !password) {
       return res.status(400).json({ message: "Por favor complete todos los campos." });
     }
 
-    // Validamos las credenciales; validateCredential retorna el ID de la credencial si es válida.
     const credentialId = await validateCredential(username, password);
 
     if (!credentialId) {
-      // Si la validación falla, retornamos un error 401.
       return res.status(401).json({ message: "Credenciales inválidas." });
     }
 
-    // Obtenemos el usuario asociado a estas credenciales.
-    // La función getUserByCredentialIdService debe buscar en la tabla de usuarios donde el campo credentialsId coincida.
     const user = await getUserByCredentialIdService(credentialId);
 
     if (!user) {
-      // Si no se encuentra el usuario, retornamos un error 404.
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
 
-    // Login exitoso: retornamos un objeto con un mensaje y el objeto usuario.
     return res.status(200).json({ message: "Login exitoso.", user });
   } catch (error) {
     console.error("Error en login:", error);

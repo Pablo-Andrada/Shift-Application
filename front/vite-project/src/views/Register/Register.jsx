@@ -1,36 +1,42 @@
 // src/views/Register/Register.jsx
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Hook para redireccionar
+import useUserContext from "../../hooks/useUserContext"; // Hook del contexto de usuario
 import styles from "./Register.module.css";
 
 /**
  * Componente Register
- * Este componente muestra un formulario controlado para el registro de un nuevo usuario.
+ * Muestra un formulario controlado para el registro de un nuevo usuario.
  * Se espera que el backend reciba un objeto con las siguientes propiedades:
  *  - name: string
  *  - email: string
  *  - birthdate: string (en formato ISO, por ejemplo "1988-07-15T00:00:00.000Z")
  *  - nDni: string
- *  - credentialsId: number
- * 
- * El formulario valida que todos los campos estén completos. Además, al enviar, convierte
- * el valor del input de fecha al formato ISO y realiza una petición POST al servidor.
- * Se notifica al usuario sobre el resultado (éxito o error) mediante un mensaje.
+ *  - password: string
+ *
+ * Si el registro es exitoso, se loguea automáticamente al usuario (guardando sus datos en el contexto),
+ * se muestra un mensaje de éxito y, después de 2 segundos, se redirecciona al Home.
+ * Si se recibe la prop onClose (usada en un modal), se cierra el modal.
  */
-const Register = () => {
-  // Estado para almacenar los datos del formulario.
-  // Solo incluimos los campos que el backend requiere.
+const Register = ({ onClose }) => {
+  // Estado para almacenar los datos del formulario, sin incluir "credentialsId"
+  // y agregando "password" y "confirmPassword".
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     birthdate: "",
     nDni: "",
-    credentialsId: ""
+    password: "",
+    confirmPassword: ""
   });
 
-  // Estado para almacenar el mensaje de estado (éxito o error).
+  // Estados para manejar el mensaje de estado (éxito o error)
   const [statusMessage, setStatusMessage] = useState("");
-  // Estado para diferenciar entre mensaje de error y éxito.
   const [isError, setIsError] = useState(false);
+
+  // Obtenemos el hook de redireccionamiento y la función loginUser desde el contexto
+  const navigate = useNavigate();
+  const { loginUser } = useUserContext();
 
   /**
    * handleChange:
@@ -44,25 +50,32 @@ const Register = () => {
   /**
    * handleSubmit:
    * Se ejecuta al enviar el formulario.
-   * Valida que todos los campos estén completos, convierte el valor de birthdate
-   * al formato ISO y realiza una petición POST al servidor con los datos del formulario.
-   * Se notifica al usuario sobre el resultado del registro (éxito o error).
+   * Valida que todos los campos estén completos y que la contraseña y su confirmación coincidan.
+   * Convierte el valor del input de fecha al formato ISO y realiza una petición POST al servidor con los datos.
+   * Si el registro es exitoso, se loguea automáticamente al usuario, se muestra un mensaje de éxito,
+   * se limpia el formulario, se cierra el modal (si se pasó onClose) y, después de 2 segundos, se redirecciona al Home.
    * @param {React.FormEvent<HTMLFormElement>} e - Evento del formulario.
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, birthdate, nDni, credentialsId } = formData;
+    const { name, email, birthdate, nDni, password, confirmPassword } = formData;
 
     // Validación: Todos los campos deben estar completos.
-    if (!name || !email || !birthdate || !nDni || !credentialsId) {
+    if (!name || !email || !birthdate || !nDni || !password || !confirmPassword) {
       setIsError(true);
       setStatusMessage("Por favor, complete todos los campos.");
       return;
     }
 
+    // Validación: Las contraseñas deben coincidir.
+    if (password !== confirmPassword) {
+      setIsError(true);
+      setStatusMessage("Las contraseñas no coinciden.");
+      return;
+    }
+
     try {
       // Realizamos la petición POST al endpoint de registro del backend.
-      // NOTA: La URL se ajusta a lo que espera el backend.
       const response = await fetch("http://localhost:3000/user/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -72,19 +85,22 @@ const Register = () => {
           email,
           birthdate: new Date(birthdate).toISOString(),
           nDni,
-          credentialsId: Number(credentialsId)
+          password
         })
       });
       const data = await response.json();
+      console.log("Respuesta del backend:", data);
 
       // Si la respuesta no es exitosa, mostramos un mensaje de error.
       if (!response.ok) {
         setIsError(true);
         setStatusMessage(
-          typeof data.error === "object" ? "Error al registrar usuario." : data.error || "Error al registrar usuario."
+          typeof data.error === "object"
+            ? "Error al registrar usuario."
+            : data.error || "Error al registrar usuario."
         );
       } else {
-        // Registro exitoso: mostramos un mensaje de éxito y limpiamos el formulario.
+        // Registro exitoso: mostramos el mensaje de éxito y limpiamos el formulario.
         setIsError(false);
         setStatusMessage(data.message || "Usuario registrado con éxito.");
         setFormData({
@@ -92,8 +108,26 @@ const Register = () => {
           email: "",
           birthdate: "",
           nDni: "",
-          credentialsId: ""
+          password: "",
+          confirmPassword: ""
         });
+        
+        // Logueamos automáticamente al usuario si el backend devuelve los datos directamente.
+        // En este caso, comprobamos que data tenga la propiedad "email" (o cualquier otro campo representativo del usuario).
+        if (data && data.email) {
+          loginUser(data); // Usamos todo el objeto directamente
+          console.log("Usuario logueado:", data);
+        } else {
+          console.warn("El backend no retornó un objeto 'user'.");
+        }
+
+        // Si se pasó onClose (por ejemplo, si el componente se muestra en un modal), lo llamamos para cerrarlo.
+        if (onClose) onClose();
+
+        // Redireccionamos automáticamente al Home después de 2 segundos.
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -102,13 +136,14 @@ const Register = () => {
     }
   };
 
-  // Se valida que todos los campos tengan valor para habilitar el botón de envío.
+  // Validamos que todos los campos tengan valor para habilitar el botón de envío.
   const isFormValid =
     formData.name &&
     formData.email &&
     formData.birthdate &&
     formData.nDni &&
-    formData.credentialsId;
+    formData.password &&
+    formData.confirmPassword;
 
   return (
     <div className={styles.container}>
@@ -172,14 +207,26 @@ const Register = () => {
             required
           />
         </div>
-        {/* Grupo de input para el credentialsId */}
+        {/* Grupo de input para la contraseña */}
         <div className={styles.formGroup}>
-          <label htmlFor="credentialsId">ID de Credenciales:</label>
+          <label htmlFor="password">Contraseña:</label>
           <input
-            type="number"
-            id="credentialsId"
-            name="credentialsId"
-            value={formData.credentialsId}
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        {/* Grupo de input para confirmar la contraseña */}
+        <div className={styles.formGroup}>
+          <label htmlFor="confirmPassword">Confirmar Contraseña:</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
             onChange={handleChange}
             required
           />

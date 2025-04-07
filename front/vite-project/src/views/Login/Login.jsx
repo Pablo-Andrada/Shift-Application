@@ -99,7 +99,7 @@ const Login = ({ onClose }) => {
       {/* Formulario controlado para login */}
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
-          <label htmlFor="username">Nombre de Usuario:</label>
+          <label htmlFor="username">email:</label>
           <input
             type="text"
             id="username"
