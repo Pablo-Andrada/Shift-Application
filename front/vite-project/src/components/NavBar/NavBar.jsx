@@ -41,7 +41,7 @@ const NavBar = () => {
           <Link to="/contacto" className={styles.navLink}>Contacto</Link>
         </li>
 
-        {/* 🔐 Si el usuario NO está logueado, mostramos login y register */}
+        {/* 🔐 Si el usuario NO está logueado, mostramos login y register
         {!user && (
           <>
             <li className={styles.navItem}>
@@ -51,7 +51,7 @@ const NavBar = () => {
               <Link to="/login" className={styles.navLink}>Login</Link>
             </li>
           </>
-        )}
+        )} */}
 
         {/* 🔓 Si el usuario está logueado, mostramos botón de cerrar sesión */}
         {user && (
