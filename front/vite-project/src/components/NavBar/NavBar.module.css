@@ -1,48 +1,65 @@
 /* src/components/NavBar/NavBar.module.css */
+
+/* Contenedor principal de la barra de navegación */
 .nav {
-    background-color: #333;
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .title {
-    color: #fff;
-    margin: 0;
-    font-size: 1.5rem;
-  }
-  
-  .navList {
-    list-style: none;
-    display: flex;
-    gap: 1rem;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .navItem {
-   background-color: #333; /* estilos para cada li */
-  }
-  
-  .navLink {
-    color: #fff;
-    text-decoration: none;
-    font-size: 1rem;
-  }
-  
-  .navLink:hover {
-    text-decoration: underline;
-  }
-  
-  /* Esto asegura que el botón se vea como un link */
+  background-color: #333;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* Tipografía moderna usando Roboto (asegúrate de incluir la fuente en tu index.html) */
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Título o logo */
+.title {
+  color: #fff;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Lista de navegación */
+.navList {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilo para cada elemento de la lista */
+.navItem {
+  /* Se mantiene el fondo para coherencia visual con el nav */
+  background-color: #333;
+}
+
+/* Estilos de los enlaces de navegación */
+.navLink {
+  color: #fff;
+  text-decoration: none;  /* Sin subrayado por defecto */
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+
+/* Cambio de color en hover, sin subrayado */
+.navLink:hover {
+  color: #ddd;
+  /* Se quita el subrayado */
+  text-decoration: none;
+}
+
+/* Estilos para el botón que se muestra como enlace en "Cerrar sesión" */
 .navButton {
-  all: unset; /* elimina todos los estilos por defecto del botón */
+  all: unset;             /* Remueve estilos por defecto del botón */
   color: #fff;
   font-size: 1rem;
   cursor: pointer;
+  transition: color 0.2s;
 }
 
+/* Cambio de color en hover para el botón de cerrar sesión */
 .navButton:hover {
-  text-decoration: underline;
+  color: #ddd;
+  text-decoration: none;
 }
