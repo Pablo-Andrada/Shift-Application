@@ -1,23 +1,33 @@
 // src/components/ProtectedRoute.jsx
 import React from "react";
-import { Navigate } from "react-router-dom";
-import  useUserContext  from "../../hooks/useUserContext";
+import { Navigate, useLocation } from "react-router-dom";
+import useUserContext from "../../hooks/useUserContext";
 
 /**
  * Componente ProtectedRoute
- * Este componente actúa como una barrera de protección para rutas privadas.
- * Si el usuario no está logueado, se lo redirige a la página de Login.
- * Si el usuario está logueado, se permite el acceso al contenido.
+ * Protege rutas privadas: mientras se cargan los datos del usuario, se muestra un spinner;
+ * si no hay usuario, redirige a /login, y si existe, renderiza los hijos.
+ *
+ * @param {object} props - Las props del componente.
+ * @param {React.ReactNode} props.children - El contenido a renderizar si el usuario está autenticado.
+ * @returns {JSX.Element} El contenido protegido o redirección a /login.
  */
 const ProtectedRoute = ({ children }) => {
-  const { user } = useUserContext();
+  // Obtenemos user e isLoading desde el contexto
+  const { user, isLoading } = useUserContext();
+  const location = useLocation();
 
-  // Si no hay usuario logueado, redirige a la ruta de login
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  // Si aún se están cargando los datos del usuario, mostramos un indicador de carga (spinner)
+  if (isLoading) {
+    return <div>Loading...</div>; // Puedes sustituirlo por un componente spinner personalizado
   }
 
-  // Si hay usuario logueado, muestra el contenido protegido
+  // Si no hay usuario, redirige a /login y guarda la ruta actual para poder volver después de loguear
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Si hay usuario, renderizamos el contenido protegido
   return children;
 };
 

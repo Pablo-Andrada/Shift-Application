@@ -13,6 +13,9 @@ import { UserProvider } from "./context/UserContext.jsx";
 // Importamos el Provider del contexto global de appointment
 import { AppointmentProvider} from "./context/AppointmentContext.jsx";
 
+//Importo estilos de react-calendar
+import 'react-calendar/dist/Calendar.css';
+
 // Importamos los estilos globales (opcional, si tenés algún CSS global)
 import "./index.css";
 

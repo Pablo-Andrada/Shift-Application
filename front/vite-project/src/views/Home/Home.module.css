@@ -9,7 +9,7 @@
   padding: 1rem;
 }
 
-/* Título principal, utilizado tanto para el saludo como para otros encabezados */
+/* Título principal, usado para el saludo y otros encabezados */
 .title {
   color: #fff;
   font-size: 2rem;
@@ -19,7 +19,7 @@
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
 }
 
-/* Contenedor para los botones de autenticación cuando no hay usuario logueado */
+/* Contenedor para los botones de autenticación cuando no hay usuario */
 .authButtonsContainer {
   display: flex;
   justify-content: center;
@@ -44,77 +44,73 @@
   transform: scale(1.05);
 }
 
-/* Contenedor para los widgets: Próximo Turno y Mini Historial */
-.widgetsContainer {
+/* Contenedor principal que divide el layout en 2 columnas */
+.layoutContainer {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: row;
   gap: 2rem;
   margin-top: 2rem;
+  width: 100%;
+  justify-content: center;
+}
+
+/* Columna Izquierda */
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+/* Columna Derecha */
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  flex: 1;
 }
 
 /* =========================== */
-/* Estructura base para cada widget (Próximo Turno y Historial) */
+/* Estructura base para cada widget */
 /* =========================== */
 .widgetContainer {
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* Asegura que el header y el body se muestren bien integrados */
+  overflow: hidden;
   width: 100%;
-  max-width: 500px;
   text-align: center;
+  margin: 0 auto;
 }
 
-/* Encabezado del widget: fondo gris semitransparente para diferenciarlo del contenido */
+/* Encabezado del widget: se diferencia con fondo gris semitransparente y padding */
 .widgetHeader {
-  background-color: rgba(220, 220, 220, 0.8);
+  background-color: rgba(220, 220, 220, 0.85);
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   font-size: 1.1rem;
   font-weight: 600;
   color: #333;
   border-bottom: 1px solid #ccc;
 }
 
-/* Cuerpo del widget: contiene el contenido después del encabezado */
+/* Cuerpo del widget */
 .widgetBody {
   padding: 1rem;
 }
 
 /* =========================== */
-/* Widget del Próximo Turno */
+/* Detalles del Próximo Turno */
 /* =========================== */
-.nextAppointmentContainer {
-  /* Usamos .widgetContainer para la estructura general */
-}
-
-.nextAppointmentTitle {
-  /* Este título ya se muestra en el header del widget, por lo que aquí podemos tener estilos adicionales si es necesario */
-  font-size: 1rem;
-  font-weight: 500;
-  color: #555;
-  margin-bottom: 0.5rem;
-}
-
 .nextAppointmentDetails {
   font-size: 1rem;
   color: #555;
 }
 
 /* =========================== */
-/* Mini Historial de Turnos */
+/* Historial de Turnos */
 /* =========================== */
-.historyContainer {
-  /* Usamos .widgetContainer para la estructura general */
-}
-
-.historyTitle {
-  /* Lo delegamos al header del widget */
-  /* Si es necesario, se pueden dejar estilos en el JSX para el título específicamente */
-}
-
 .historyList {
   list-style: none;
   padding: 0;
@@ -143,14 +139,12 @@
 }
 
 /* =========================== */
-/* Insignias (Badges) para el Estado del Turno */
+/* Insignias para el estado del turno */
 /* =========================== */
-
-/* Estilo base de la insignia */
 .statusBadge {
   display: inline-block;
   padding: 0.3rem 0.6rem;
-  border-radius: 9999px; /* Alto border-radius para efecto pill */
+  border-radius: 9999px; /* Efecto pill */
   font-size: 0.8rem;
   font-weight: 600;
   margin-left: 0.5rem;
@@ -158,12 +152,72 @@
   color: #fff;
 }
 
-/* Insignia para turno activo */
 .activeBadge {
   background-color: #28a745; /* Verde */
 }
 
-/* Insignia para turno cancelado */
 .cancelledBadge {
   background-color: #dc3545; /* Rojo */
 }
+
+/* =========================== */
+/* Calendario de Turnos */
+/* =========================== */
+.turnoIndicator {
+  margin-top: 2px;
+  height: 6px;
+  width: 6px;
+  background-color: #28a745; /* Verde para indicar turnos */
+  border-radius: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* =========================== */
+/* Turnos del Día Seleccionado */
+/* =========================== */
+.dayTurnosList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dayTurnoItem {
+  font-size: 0.95rem;
+  color: #555;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.noTurnosMessage {
+  font-size: 0.95rem;
+  color: #555;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* =========================== */
+/* Estilos para el Calendario y Resumen del Día */
+/* (Puedes ajustar estos estilos para lograr la estética deseada) */
+.calendarContainer {
+  /* Ejemplo: agrega margen y redondeo si es necesario */
+  margin: 1rem auto;
+  max-width: 400px;
+}
+
+.dayTurnosTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+  background-color: rgba(220, 220, 220, 0.85);
+  padding: 0.5rem;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Puedes agregar más estilos específicos para el resumen del día si lo deseas */
