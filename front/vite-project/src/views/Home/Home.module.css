@@ -1,18 +1,15 @@
 /* src/views/Home/Home.module.css */
 
+/* Contenedor principal del Home, con fondo, imagen de fondo y disposición en columna */
 .homeContainer {
-  /* Ocupa al menos todo el alto de la pantalla */
   min-height: 100vh;
-
-  /* Aplica la imagen de fondo */
   background: url("../../assets/images/Imagen-taller-mecanico.jpg") no-repeat center center / cover;
-
-  /* Usamos flex para acomodar el contenido verticalmente */
   display: flex;
   flex-direction: column;
+  padding: 1rem;
 }
 
-/* Título que ya tenías */
+/* Título principal, utilizado tanto para el saludo como para otros encabezados */
 .title {
   color: #fff;
   font-size: 2rem;
@@ -22,27 +19,151 @@
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
 }
 
-/* NUEVO: contenedor de los botones para login y register */
+/* Contenedor para los botones de autenticación cuando no hay usuario logueado */
 .authButtonsContainer {
   display: flex;
+  justify-content: center;
   gap: 1rem;
   margin-top: 2rem;
-  padding-left: 2rem;
 }
 
-/* NUEVO: botones de acción para login y register */
+/* Botones de acción (para Login, Register) */
 .actionButton {
-  background-color: #333;
+  background-color: #007bff;
   color: #fff;
   border: none;
   padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 1rem;
+  transition: background-color 0.2s, transform 0.2s;
 }
 
-/* Efecto hover para los botones */
 .actionButton:hover {
-  background-color: #555;
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+/* Contenedor para los widgets: Próximo Turno y Mini Historial */
+.widgetsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* =========================== */
+/* Estructura base para cada widget (Próximo Turno y Historial) */
+/* =========================== */
+.widgetContainer {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Asegura que el header y el body se muestren bien integrados */
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+/* Encabezado del widget: fondo gris semitransparente para diferenciarlo del contenido */
+.widgetHeader {
+  background-color: rgba(220, 220, 220, 0.8);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Cuerpo del widget: contiene el contenido después del encabezado */
+.widgetBody {
+  padding: 1rem;
+}
+
+/* =========================== */
+/* Widget del Próximo Turno */
+/* =========================== */
+.nextAppointmentContainer {
+  /* Usamos .widgetContainer para la estructura general */
+}
+
+.nextAppointmentTitle {
+  /* Este título ya se muestra en el header del widget, por lo que aquí podemos tener estilos adicionales si es necesario */
+  font-size: 1rem;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.nextAppointmentDetails {
+  font-size: 1rem;
+  color: #555;
+}
+
+/* =========================== */
+/* Mini Historial de Turnos */
+/* =========================== */
+.historyContainer {
+  /* Usamos .widgetContainer para la estructura general */
+}
+
+.historyTitle {
+  /* Lo delegamos al header del widget */
+  /* Si es necesario, se pueden dejar estilos en el JSX para el título específicamente */
+}
+
+.historyList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.historyItem {
+  font-size: 0.95rem;
+  color: #555;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.historyItem:last-child {
+  border-bottom: none;
+}
+
+.historyDetails {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* =========================== */
+/* Insignias (Badges) para el Estado del Turno */
+/* =========================== */
+
+/* Estilo base de la insignia */
+.statusBadge {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  border-radius: 9999px; /* Alto border-radius para efecto pill */
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  color: #fff;
+}
+
+/* Insignia para turno activo */
+.activeBadge {
+  background-color: #28a745; /* Verde */
+}
+
+/* Insignia para turno cancelado */
+.cancelledBadge {
+  background-color: #dc3545; /* Rojo */
 }
