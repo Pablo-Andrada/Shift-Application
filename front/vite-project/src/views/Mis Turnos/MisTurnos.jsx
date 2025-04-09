@@ -1,16 +1,29 @@
 // src/views/Mis Turnos/MisTurnos.jsx
 import React, { useEffect, useState } from "react";
-// Importamos los estilos locales
 import styles from "./MisTurnos.module.css";
-// Importamos el hook de contexto para acceder al usuario logueado
 import useUserContext from "../../hooks/useUserContext";
-// Importamos el componente AppointmentCard para mostrar cada turno
 import AppointmentCard from "../../components/AppointmentCard/AppointmentCard";
 
 /**
+ * Función auxiliar para construir un string ISO que incluya fecha y hora,
+ * evitando que el turno quede desfasado por la zona horaria.
+ *
+ * @param {string} dateStr - Fecha en formato "YYYY-MM-DD" del input type="date".
+ * @param {string} timeStr - Hora en formato "HH:MM" del input type="time".
+ * @returns {string} Una cadena en formato ISO que el backend interpretará correctamente.
+ */
+const buildISODateTime = (dateStr, timeStr) => {
+  // Creamos un objeto Date a partir de la combinación
+  const dateObj = new Date(`${dateStr}T${timeStr}:00`);
+  // Ajustamos (restamos) el timezoneOffset para que el backend reciba la fecha "real"
+  const localTime = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000);
+  // Retornamos en formato ISO
+  return localTime.toISOString();
+};
+
+/**
  * Componente MisTurnos
- * Muestra los turnos asociados al usuario logueado.
- * Si el usuario no está logueado, no se debe acceder a esta vista (está protegida en App.jsx).
+ * Muestra y crea los turnos asociados al usuario logueado.
  */
 const MisTurnos = () => {
   const { user } = useUserContext();
@@ -25,6 +38,10 @@ const MisTurnos = () => {
   const [newDate, setNewDate] = useState("");
   const [newTime, setNewTime] = useState("");
 
+  /**
+   * useEffect:
+   * Carga la lista de turnos del usuario.
+   */
   useEffect(() => {
     if (!user) return;
 
@@ -48,18 +65,30 @@ const MisTurnos = () => {
     fetchAppointments();
   }, [user]);
 
+  /**
+   * handleFilterChange:
+   * Actualiza el estado de filtro (todos, activos, cancelados).
+   */
   const handleFilterChange = (e) => {
     setFilterStatus(e.target.value);
   };
 
+  /**
+   * filteredAppointments:
+   * Aplica el filtro sobre appointments (según estado).
+   */
   const filteredAppointments =
     filterStatus === "todos"
       ? appointments
       : appointments.filter((appt) => appt.status === filterStatus);
 
+  /**
+   * handleCancel:
+   * Cancela un turno (PUT /appointments/cancel/:id) y actualiza el estado local.
+   */
   const handleCancel = async (id) => {
-    const confirm = window.confirm("¿Estás seguro que querés cancelar este turno?");
-    if (!confirm) return;
+    const confirmAction = window.confirm("¿Estás seguro que querés cancelar este turno?");
+    if (!confirmAction) return;
 
     try {
       const response = await fetch(`http://localhost:3000/appointments/cancel/${id}`, {
@@ -68,11 +97,9 @@ const MisTurnos = () => {
       if (!response.ok) {
         throw new Error("No se pudo cancelar el turno.");
       }
-
-      setAppointments((prevAppointments) =>
-        prevAppointments.map((appt) =>
-          appt.id === id ? { ...appt, status: "cancelled" } : appt
-        )
+      // Actualizamos localmente el estado a "cancelled"
+      setAppointments((prev) =>
+        prev.map((appt) => (appt.id === id ? { ...appt, status: "cancelled" } : appt))
       );
     } catch (err) {
       console.error("Error al cancelar turno:", err.message);
@@ -82,32 +109,33 @@ const MisTurnos = () => {
 
   /**
    * handleCreateAppointment:
-   * Envía el nuevo turno al backend y actualiza la lista de turnos si todo sale bien.
+   * Envía el nuevo turno al backend (POST /appointments/schedule)
+   * construyendo una fecha-hora ISO para evitar desfasajes.
    */
   const handleCreateAppointment = async (e) => {
     e.preventDefault();
-
     try {
+      // Construimos la fecha-hora ISO a partir de newDate + newTime
+      const isoDateTime = buildISODateTime(newDate, newTime);
+
       const response = await fetch("http://localhost:3000/appointments/schedule", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          date: newDate,
-          time: newTime,
+          date: isoDateTime, // Enviamos la cadena ISO
+          time: newTime,     // Dejamos la cadena "HH:MM" + "AM/PM" si fuese el caso
           userId: user.id,
         }),
       });
-
       if (!response.ok) {
         throw new Error("No se pudo crear el turno.");
       }
-
+      // Obtenemos el turno recién creado
       const newAppointment = await response.json();
+      // Agregamos el turno a la lista
       setAppointments((prev) => [...prev, newAppointment]);
 
-      // Cerramos el modal y limpiamos campos
+      // Cerramos el modal y limpiamos los campos
       setIsModalOpen(false);
       setNewDate("");
       setNewTime("");
@@ -146,6 +174,7 @@ const MisTurnos = () => {
       {loading && <p className={styles.loading}>Cargando turnos...</p>}
       {error && <p className={styles.error}>{error}</p>}
 
+      {/* Renderizamos la lista de turnos filtrados */}
       {!loading && !error && filteredAppointments.length > 0 ? (
         <ul className={styles.appointmentList}>
           {filteredAppointments.map((appt) => (
@@ -161,11 +190,8 @@ const MisTurnos = () => {
           ))}
         </ul>
       ) : (
-        !loading && !error && (
-          <p className={styles.noAppointments}>
-            No hay turnos que coincidan con el filtro seleccionado.
-          </p>
-        )
+        !loading &&
+        !error && <p className={styles.noAppointments}>No hay turnos que coincidan con el filtro seleccionado.</p>
       )}
 
       {/* Modal para crear nuevo turno */}

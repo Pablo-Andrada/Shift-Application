@@ -7,30 +7,29 @@ import useUserContext from "../../hooks/useUserContext"; // Hook del contexto de
 
 // Importamos el componente Modal para los formularios de Login y Register
 import Modal from "../../components/Modal/Modal";
-// Importamos los formularios de Login y Register que se muestran en los modales
 import Login from "../Login/Login";
 import Register from "../Register/Register";
 
 /**
  * Función que ajusta la fecha recibida (en formato ISO) sumándole el desfase de la zona horaria.
- * Esto permite que la fecha se muestre correctamente en la zona local.
+ * Esto permite que la fecha se muestre correctamente en la hora local del navegador.
  *
  * @param {string} dateStr - La fecha en formato ISO proveniente del backend.
  * @returns {Date} La fecha ajustada a la hora local.
  */
 const adjustDate = (dateStr) => {
   const date = new Date(dateStr);
-  // Suma el desfase en milisegundos que el navegador aplica a la fecha
+  // Suma el desfase (en milisegundos) que el navegador aplica a la fecha
   const adjusted = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
   return adjusted;
 };
 
 /**
  * Función helper para convertir un string de hora en formato "HH:MM AM/PM" a minutos.
- * Esto permite ordenar los turnos del día de forma cronológica.
+ * Permite ordenar los turnos de un día en orden cronológico.
  *
- * @param {string} timeStr - La hora en formato "HH:MM AM/PM"
- * @returns {number} Los minutos transcurridos desde la medianoche.
+ * @param {string} timeStr - Formato "HH:MM AM" o "HH:MM PM".
+ * @returns {number} Minutos totales desde la medianoche.
  */
 const parseTime = (timeStr) => {
   const [time, modifier] = timeStr.split(" ");
@@ -48,57 +47,56 @@ const parseTime = (timeStr) => {
  * Componente Home
  *
  * - Muestra un saludo si hay un usuario logueado.
- * - Si el usuario está logueado, muestra dos columnas:
- *    - Columna Izquierda:
- *         1. Widget: Tu próximo turno.
- *         2. Widget: Historial de Turnos (últimos 3).
- *    - Columna Derecha:
- *         1. Widget: Calendario de Turnos.
- *         2. Widget: Turnos para la fecha seleccionada (ordenados de más temprano a más tarde).
- * - Si el usuario no está logueado, muestra un mensaje genérico y botones para iniciar sesión o registrarse.
+ * - Si el usuario está logueado, muestra 2 columnas:
+ *   - Izquierda: Próximo turno y mini-historial (últimos 3).
+ *   - Derecha: Calendario de turnos y turnos para la fecha seleccionada.
+ * - Si no hay usuario, muestra un mensaje genérico y botones de Login/Register.
  */
 function Home() {
-  // Obtenemos el usuario desde el contexto global
+  // Obtenemos el usuario actual desde el contexto global
   const { user } = useUserContext();
 
-  // Estados para controlar la apertura de los modales de Login y Register
+  // Manejo de modales (Login y Register)
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
-  // Estado para almacenar el próximo turno activo del usuario
+  // Estado para el próximo turno activo
   const [nextAppointment, setNextAppointment] = useState(null);
-  // Estado para almacenar todos los turnos del usuario (para mini historial y calendario)
+  // Estado con todos los turnos del usuario
   const [allAppointments, setAllAppointments] = useState([]);
 
-  // Estado que controla la fecha seleccionada en el calendario
+  // Fecha seleccionada en el calendario
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   /**
-   * Función para obtener los turnos del usuario desde el backend.
-   * Se encarga de:
-   * - Guardar el arreglo completo de turnos en allAppointments.
-   * - Calcular el próximo turno activo (usando adjustDate para corregir la zona horaria).
+   * fetchAppointments:
+   * Obtiene la lista de turnos del backend y determina el próximo turno activo.
    */
   const fetchAppointments = useCallback(async () => {
     if (!user) return; // Si no hay usuario, no hacemos nada
+
     try {
+      // 1) Pedimos los turnos del usuario al backend
       const response = await fetch(`http://localhost:3000/appointments/user/${user.id}`);
       if (!response.ok) {
         throw new Error("No se pudieron obtener los turnos.");
       }
       const appointments = await response.json();
-      // Guardamos todos los turnos para el mini historial y calendario
+
+      // 2) Guardamos todos los turnos en estado
       setAllAppointments(appointments);
 
+      // 3) Determinamos el "próximo turno activo" comparando la fecha ajustada
       const now = new Date();
-      // Filtramos los turnos activos posteriores o iguales a la fecha actual
       const upcomingAppointments = appointments.filter((appt) => {
         const adjDate = adjustDate(appt.date);
         return adjDate >= now && appt.status === "active";
       });
-      // Ordenamos ascendentemente para obtener el turno más cercano (ajustado a la hora local)
+
+      // Ordenamos por fecha ajustada ascendentemente
       upcomingAppointments.sort((a, b) => adjustDate(a.date) - adjustDate(b.date));
-      // Guardamos el turno más cercano, o null si no existe ninguno
+
+      // Si hay alguno, guardamos el primero como el más cercano
       setNextAppointment(upcomingAppointments.length > 0 ? upcomingAppointments[0] : null);
     } catch (error) {
       console.error("Error al obtener turnos:", error);
@@ -106,21 +104,25 @@ function Home() {
   }, [user]);
 
   /**
-   * useEffect para cargar los turnos del usuario al montarse el componente y refrescarlos cada 30 segundos.
+   * useEffect principal:
+   * Al montar el componente y cada cierto intervalo, refresca la lista de turnos.
+   * Así, si creas un turno en MisTurnos, se reflejará aquí (aunque estés en la misma sesión).
    */
   useEffect(() => {
+    // Hacemos la primera carga
     fetchAppointments();
-    // Refresca turnos cada 30 segundos
+
+    // Intervalo para refrescar turnos cada 5 segundos
     const interval = setInterval(() => {
       fetchAppointments();
-    }, 30000);
+    }, 1000);
+
     return () => clearInterval(interval);
   }, [user, fetchAppointments]);
 
   /**
    * miniHistory:
-   * Calcula los 3 turnos más recientes del historial (ordenados por fecha descendente)
-   * y ajusta las fechas a la hora local.
+   * Sacamos los 3 turnos más recientes, sin importar estado, y ajustamos sus fechas.
    */
   const miniHistory =
     allAppointments.length > 0
@@ -131,8 +133,7 @@ function Home() {
 
   /**
    * dailyAppointments:
-   * Filtra y lista los turnos programados para la fecha seleccionada en el calendario.
-   * Se usa adjustDate para corregir el desfase horario y se ordenan por la hora (de más temprano a más tarde).
+   * Turnos para la fecha seleccionada en el calendario, ordenados por hora de menor a mayor.
    */
   const dailyAppointments = allAppointments
     .filter((appt) => {
@@ -148,8 +149,6 @@ function Home() {
   /**
    * handleDateChange:
    * Actualiza la fecha seleccionada del calendario.
-   *
-   * @param {Date} date - La nueva fecha seleccionada.
    */
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -157,14 +156,15 @@ function Home() {
 
   return (
     <div className={styles.homeContainer}>
-      {/* Saludo personalizado si hay usuario; de lo contrario, mensaje genérico y botones de autenticación */}
+      {/** 
+       * Si hay usuario, lo saludamos con su name.
+       * Si no hay, mostramos un título genérico y los botones de Login/Register.
+       */}
       {user ? (
         <p className={styles.title}>Hola {user.name} 👋 ¡Bienvenido al taller!</p>
       ) : (
         <>
-          <h2 className={styles.title}>
-            Taller Automotriz: Mecánica avanzada al instante.
-          </h2>
+          <h2 className={styles.title}>Taller Automotriz: Mecánica avanzada al instante.</h2>
           <div className={styles.authButtonsContainer}>
             <button onClick={() => setIsLoginOpen(true)} className={styles.actionButton}>
               Iniciar Sesión
@@ -176,12 +176,14 @@ function Home() {
         </>
       )}
 
-      {/* Renderizamos widgets sólo si hay usuario logueado */}
+      {/**
+       * Solo mostramos los widgets si el usuario está logueado
+       */}
       {user && (
         <div className={styles.layoutContainer}>
-          {/* ================= Columna Izquierda ================= */}
+          {/** ==================== Columna Izquierda ==================== */}
           <div className={styles.leftColumn}>
-            {/* Widget: Tu próximo turno */}
+            {/** Widget: Tu próximo turno */}
             <div className={styles.widgetContainer}>
               <div className={styles.widgetHeader}>Tu próximo turno</div>
               <div className={styles.widgetBody}>
@@ -204,7 +206,7 @@ function Home() {
               </div>
             </div>
 
-            {/* Widget: Historial de Turnos */}
+            {/** Widget: Historial de Turnos */}
             <div className={styles.widgetContainer}>
               <div className={styles.widgetHeader}>Historial de Turnos</div>
               <div className={styles.widgetBody}>
@@ -232,9 +234,9 @@ function Home() {
             </div>
           </div>
 
-          {/* ================= Columna Derecha ================= */}
+          {/** ==================== Columna Derecha ==================== */}
           <div className={styles.rightColumn}>
-            {/* Widget: Calendario de Turnos */}
+            {/** Calendario de Turnos */}
             <div className={styles.widgetContainer}>
               <div className={styles.widgetHeader}>Calendario de Turnos</div>
               <div className={styles.widgetBody}>
@@ -243,7 +245,7 @@ function Home() {
                   value={selectedDate}
                   tileContent={({ date, view }) => {
                     if (view === "month") {
-                      // Determina si hay turnos en la fecha 'date'
+                      // ¿Hay turnos en esa fecha?
                       const hasTurno = allAppointments.some((appt) => {
                         const apptDate = adjustDate(appt.date);
                         return (
@@ -252,7 +254,6 @@ function Home() {
                           apptDate.getDate() === date.getDate()
                         );
                       });
-                      // Retornamos un indicador (círculo) si la fecha tiene turnos
                       return hasTurno ? <div className={styles.turnoIndicator} /> : null;
                     }
                   }}
@@ -260,7 +261,7 @@ function Home() {
               </div>
             </div>
 
-            {/* Widget: Turnos para la Fecha Seleccionada */}
+            {/** Turnos del día seleccionado */}
             <div className={styles.widgetContainer}>
               <div className={styles.widgetHeader}>
                 Turnos para {selectedDate.toLocaleDateString()}
@@ -294,12 +295,11 @@ function Home() {
         </div>
       )}
 
-      {/* Modal para Login */}
+      {/** Modales de Login y Register */}
       <Modal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)}>
         <Login onClose={() => setIsLoginOpen(false)} />
       </Modal>
 
-      {/* Modal para Register */}
       <Modal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)}>
         <Register onClose={() => setIsRegisterOpen(false)} />
       </Modal>
