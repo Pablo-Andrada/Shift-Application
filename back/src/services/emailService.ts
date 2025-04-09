@@ -3,47 +3,89 @@ import nodemailer from "nodemailer";
 // Importamos las variables de entorno necesarias: EMAIL_USER, EMAIL_PASSWORD y RECEIVER_EMAIL
 import { EMAIL_USER, EMAIL_PASSWORD, RECEIVER_EMAIL } from "../config/envs";
 
-// Configuramos el transportador (transporter) que se encargará de enviar los correos.
-// En este caso, usamos Gmail como servicio. El transportador utiliza la cuenta configurada en las variables de entorno.
+/**
+ * Configuración del transportador.
+ * Se utiliza Gmail como servicio de correo; el transportador usa las credenciales definidas en las variables de entorno.
+ */
 const transporter = nodemailer.createTransport({
   service: "Gmail", // Usamos el servicio de Gmail
   auth: {
-    user: EMAIL_USER,         // Correo electrónico desde el cual se enviarán los mensajes
-    pass: EMAIL_PASSWORD,     // Contraseña o contraseña de aplicación para acceder a la cuenta
+    user: EMAIL_USER,   // Correo electrónico desde el cual se enviarán los mensajes
+    pass: EMAIL_PASSWORD, // Contraseña o contraseña de aplicación para acceder a la cuenta
   },
 });
 
-// Definimos una interfaz ContactData para tipar los datos que se enviarán en el correo.
-// Esto ayuda a garantizar que se pasen correctamente los campos necesarios.
+/**
+ * INTERFAZ: ContactData
+ * Tipado para los datos del formulario de contacto.
+ */
 interface ContactData {
-  name: string;   // Nombre del remitente
-  email: string;  // Correo del remitente
+  name: string;    // Nombre del remitente
+  email: string;   // Correo del remitente
   message: string; // Mensaje enviado
 }
 
 /**
+ * sendContactEmail
  * Envía un correo con los datos del formulario de contacto.
  *
- * Esta función recibe un objeto con la información del contacto y construye el correo
- * que se enviará a la dirección configurada en RECEIVER_EMAIL.
- *
- * @param {ContactData} contactData - Objeto que contiene los datos del formulario: name, email y message.
- * @returns {Promise} Una promesa que se resuelve cuando el correo es enviado exitosamente o se rechaza en caso de error.
+ * @param {ContactData} contactData - Objeto que contiene el nombre, email y mensaje.
+ * @returns {Promise} Promesa que se resuelve cuando el correo se envía correctamente o se rechaza en caso de error.
  */
 export async function sendContactEmail({ name, email, message }: ContactData) {
-  // Se construye el objeto mailOptions que define el contenido y configuración del correo.
-  // Incluye: remitente, destinatario, asunto y cuerpo del mensaje.
+  // Definimos las opciones del correo
   const mailOptions = {
-    from: `"Contacto desde Turnero Taller Mecánica Avanzada (Shift-Application)" <${EMAIL_USER}>`, // Remitente (con un nombre descriptivo)
-    to: RECEIVER_EMAIL, // Destinatario: la casilla que recibirá el correo
-    subject: "Nuevo mensaje de contacto", // Asunto del mensaje
+    from: `"Contacto desde Turnero Taller Mecánica Avanzada (Shift-Application)" <${EMAIL_USER}>`,
+    to: RECEIVER_EMAIL,
+    subject: "Nuevo mensaje de contacto",
     text: `Has recibido un nuevo mensaje desde el formulario de contacto de Taller Mecánica Avanzada:\n\n` +
           `Nombre: ${name}\n` +
           `Email: ${email}\n\n` +
-          `Mensaje:\n${message}`, // Cuerpo del mensaje en formato texto
+          `Mensaje:\n${message}`,
   };
 
-  // Se envía el correo utilizando el transportador configurado.
-  // La función transporter.sendMail(mailOptions) retorna una promesa que se resuelve cuando el correo se envía exitosamente.
+  // Enviamos el correo y retornamos la promesa
+  return transporter.sendMail(mailOptions);
+}
+
+/**
+ * INTERFAZ: AppointmentData
+ * Tipado para los datos del turno que se usarán para enviar el correo de confirmación.
+ */
+interface AppointmentData {
+  appointmentId: number;  // ID generado para el turno
+  date: string;           // Fecha del turno (en formato ISO)
+  time: string;           // Hora del turno (por ejemplo, "10:00 AM")
+  userName: string;       // Nombre del usuario (para personalizar el correo)
+  userEmail: string;      // Email del usuario (destinatario del correo)
+}
+
+/**
+ * sendAppointmentConfirmationEmail
+ * Envía un correo de confirmación al usuario cuando se crea un nuevo turno.
+ *
+ * Esta función construye un correo con los datos del turno (fecha, hora, ID) y
+ * lo envía al correo del usuario para confirmar que el turno fue creado exitosamente.
+ *
+ * @param {AppointmentData} appointment - Objeto que contiene los datos del turno y del usuario.
+ * @returns {Promise} Promesa que se resuelve cuando el correo se envía o se rechaza en caso de error.
+ */
+export async function sendAppointmentConfirmationEmail(appointment: AppointmentData) {
+  // Definimos las opciones del correo específico para la confirmación de turno
+  const mailOptions = {
+    from: `"Turno Confirmado - Taller Mecánica Avanzada" <${EMAIL_USER}>`, // Remitente descriptivo
+    to: appointment.userEmail, // Destinatario: correo del usuario
+    subject: `Confirmación de turno #${appointment.appointmentId}`, // Asunto con el ID del turno
+    text: `Hola ${appointment.userName},\n\n` +
+          `Tu turno ha sido reservado exitosamente.\n\n` +
+          `Detalles del turno:\n` +
+          `Fecha: ${new Date(appointment.date).toLocaleDateString()}\n` +
+          `Hora: ${appointment.time}\n\n` +
+          `Gracias por confiar en nosotros.\n\n` +
+          `Atentamente,\n` +
+          `Taller Mecánica Avanzada`,
+  };
+
+  // Enviamos el correo utilizando el mismo transportador configurado
   return transporter.sendMail(mailOptions);
 }

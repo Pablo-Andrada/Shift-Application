@@ -60,6 +60,6 @@
 
 /* Cambio de color en hover para el botón de cerrar sesión */
 .navButton:hover {
-  color: #ddd;
+  color: #f12222;
   text-decoration: none;
 }
