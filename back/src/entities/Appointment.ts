@@ -1,4 +1,35 @@
-// import { Column, Entity, PrimaryGeneratedColumn,ManyToOne } from "typeorm";
+// // import { Column, Entity, PrimaryGeneratedColumn,ManyToOne } from "typeorm";
+// // import { User } from "./User";
+
+// // @Entity({
+// //     name: "appointments"
+// // })
+// // export class Appointment {
+// //     @PrimaryGeneratedColumn()
+// //     id: number;
+    
+// //     @Column()
+// //     date: Date;
+    
+// //     @Column()
+// //     time: string;
+    
+// //     @Column()
+// //     userId: number;
+
+// //     @Column()
+// //     status: 'active' | 'cancelled';
+
+// //     @ManyToOne(() => User, (user) => user.appointments)
+// //     user: User
+// // }
+
+// // // id: 1,
+// // // date: new Date('2024-12-25'),
+// // // time: '14:00',
+// // // userId: 1,
+// // // status: 'active',
+// import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 // import { User } from "./User";
 
 // @Entity({
@@ -17,18 +48,16 @@
 //     @Column()
 //     userId: number;
 
-//     @Column()
-//     status: 'active' | 'cancelled';
+//     @Column({
+//         type: "enum",
+//         enum: ["active", "cancelled"],  
+//         default: "active"  // Por defecto, los turnos están activos
+//     })
+//     status: "active" | "cancelled";
 
 //     @ManyToOne(() => User, (user) => user.appointments)
-//     user: User
+//     user: User; // Se eliminó userId porque TypeORM lo maneja solo
 // }
-
-// // id: 1,
-// // date: new Date('2024-12-25'),
-// // time: '14:00',
-// // userId: 1,
-// // status: 'active',
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { User } from "./User";
 
@@ -51,10 +80,16 @@ export class Appointment {
     @Column({
         type: "enum",
         enum: ["active", "cancelled"],  
-        default: "active"  // Por defecto, los turnos están activos
+        default: "active"
     })
     status: "active" | "cancelled";
 
+    @Column({
+        type: "boolean",
+        default: false // ⬅️ Por defecto no se envió el recordatorio
+    })
+    reminderSent: boolean;
+
     @ManyToOne(() => User, (user) => user.appointments)
-    user: User; // Se eliminó userId porque TypeORM lo maneja solo
+    user: User;
 }
