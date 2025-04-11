@@ -1,4 +1,3 @@
-// src/controllers/appointmentsController.ts
 import { Request, Response } from "express";
 import {
   getAllAppointmentsService,
@@ -8,8 +7,9 @@ import {
 } from "../services/appointmentService";
 import { Appointment } from "../entities/Appointment";
 import { getAppointmentsByUserIdService } from "../services/appointmentService";
-// Importamos la función para enviar el correo de confirmación
-import { sendAppointmentConfirmationEmail } from "../services/emailService";
+
+// Importamos la función para enviar correos de confirmación y de cancelación
+import { sendAppointmentConfirmationEmail, sendAppointmentCancellationEmail } from "../services/emailService";
 
 /**
  * GET /appointments
@@ -33,10 +33,9 @@ export const getAppointmentsController = async (req: Request, res: Response) => 
  */
 export const getAppointmentIdController = async (req: Request, res: Response) => {
   try {
-    // Aquí se asume que el ID llega como parámetro de ruta: /appointments/123
+    // Se asume que el ID llega como parámetro de ruta, ej: /appointments/123
     const { id } = req.params;
     const appointment: Appointment | null = await getAppointmentByIdService(Number(id));
-
     if (!appointment) {
       return res.status(404).json({ message: "No se encontró el turno" });
     }
@@ -60,7 +59,7 @@ export const getAppointmentIdController = async (req: Request, res: Response) =>
 export const createAppointmentController = async (req: Request, res: Response) => {
   try {
     const { date, time, userId } = req.body;
-    // Convertimos `date` a un objeto Date, y `userId` a number
+    // Convertimos `date` a un objeto Date y `userId` a number
     const newAppointment: Appointment | null = await createAppointmentService(
       new Date(date),
       time,
@@ -71,13 +70,12 @@ export const createAppointmentController = async (req: Request, res: Response) =
       return res.status(400).json({ message: "No se pudo crear el turno (usuario inexistente)" });
     }
 
-    // Intentamos enviar el correo de confirmación
-    // Es importante que newAppointment.user esté definido (ya que en el service se asigna la relación)
+    // Enviar el correo de confirmación sólo si la relación con el usuario está definida
     if (newAppointment.user) {
-      // Construimos el objeto de datos para enviar en el correo
+      // Construimos el objeto de datos para el correo de confirmación
       const appointmentData = {
         appointmentId: newAppointment.id,
-        date: newAppointment.date.toISOString(), // Convertimos a ISO para que el email muestre la fecha de forma estandarizada
+        date: newAppointment.date.toISOString(), // Convertimos a ISO para estandarizar la fecha
         time: newAppointment.time,
         userName: newAppointment.user.name,
         userEmail: newAppointment.user.email,
@@ -88,14 +86,12 @@ export const createAppointmentController = async (req: Request, res: Response) =
         console.log("✅ Correo de confirmación enviado a:", newAppointment.user.email);
       } catch (emailError: any) {
         console.error("❌ Error al enviar el correo de confirmación:", emailError.message || emailError);
-        // Podemos decidir si fallamos la solicitud o simplemente loguear el error y continuar.
-        // En este ejemplo, continuamos y enviamos la respuesta de éxito del turno.
+        // Decisión: continuar sin fallar la petición
       }
     } else {
       console.warn("⚠️ El turno creado no tiene usuario asociado para enviar el correo de confirmación.");
     }
 
-    // Respondemos con el turno creado
     res.status(201).json(newAppointment);
   } catch (error) {
     res.status(500).json({
@@ -107,15 +103,42 @@ export const createAppointmentController = async (req: Request, res: Response) =
 
 /**
  * PUT /appointments/cancel/:id
- * Cambiar el estatus de un turno a “cancelled”.
+ * Cambiar el estatus de un turno a “cancelled” y enviar un correo de confirmación de cancelación.
  */
 export const updateAppointmentController = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params; // Puede recibirse por URL: /appointments/:id
+    const { id } = req.params; // Se recibe el ID del turno en la URL
 
+    // Obtenemos primero el turno para tener sus datos
+    const appointment = await getAppointmentByIdService(Number(id));
+    if (!appointment) {
+      return res.status(404).json({ message: "No se encontró el turno a cancelar" });
+    }
+
+    // Cancelamos el turno
     const success = await cancelAppointmentService(Number(id));
     if (!success) {
       return res.status(404).json({ message: "No se encontró el turno a cancelar" });
+    }
+
+    // Enviar el correo de cancelación solo si el usuario está asociado al turno
+    if (appointment.user) {
+      const cancellationData = {
+        appointmentId: appointment.id,
+        date: appointment.date.toISOString(),
+        time: appointment.time,
+        userName: appointment.user.name,
+        userEmail: appointment.user.email,
+      };
+      try {
+        await sendAppointmentCancellationEmail(cancellationData);
+        console.log("✅ Correo de cancelación enviado a:", appointment.user.email);
+      } catch (emailError: any) {
+        console.error("❌ Error al enviar el correo de cancelación:", emailError.message || emailError);
+        // Continuamos sin fallar la petición
+      }
+    } else {
+      console.warn("⚠️ El turno cancelado no tiene usuario asociado para enviar el correo de cancelación.");
     }
 
     res.status(200).json({ message: "Turno cancelado exitosamente" });
@@ -134,10 +157,8 @@ export const updateAppointmentController = async (req: Request, res: Response) =
 export const getAppointmentsByUserController = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-
-    // Este servicio trae todos los turnos con ese userId
+    // Este servicio trae todos los turnos del usuario cuyo ID es userId
     const appointments: Appointment[] = await getAppointmentsByUserIdService(Number(userId));
-
     res.status(200).json(appointments);
   } catch (error) {
     res.status(500).json({
