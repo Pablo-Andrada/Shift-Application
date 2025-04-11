@@ -1,8 +1,8 @@
 // src/services/emailService.ts
 
-// Importamos nodemailer, la librería que nos permite enviar correos desde Node.js
+// Importamos nodemailer, la librería que nos permite enviar correos desde Node.js.
 import nodemailer from "nodemailer";
-// Importamos las variables de entorno necesarias: EMAIL_USER, EMAIL_PASSWORD y RECEIVER_EMAIL
+// Importamos las variables de entorno necesarias: EMAIL_USER, EMAIL_PASSWORD y RECEIVER_EMAIL.
 import { EMAIL_USER, EMAIL_PASSWORD, RECEIVER_EMAIL } from "../config/envs";
 
 /**
@@ -12,8 +12,8 @@ import { EMAIL_USER, EMAIL_PASSWORD, RECEIVER_EMAIL } from "../config/envs";
 const transporter = nodemailer.createTransport({
   service: "Gmail", // Usamos el servicio de Gmail
   auth: {
-    user: EMAIL_USER,      // Correo electrónico desde el cual se enviarán los mensajes
-    pass: EMAIL_PASSWORD,  // Contraseña o contraseña de aplicación para acceder a la cuenta
+    user: EMAIL_USER,       // Correo electrónico desde el cual se enviarán los mensajes
+    pass: EMAIL_PASSWORD,   // Contraseña o contraseña de aplicación para acceder a la cuenta
   },
 });
 
@@ -35,10 +35,10 @@ interface ContactData {
  * @returns {Promise} Promesa que se resuelve cuando el correo se envía correctamente o se rechaza en caso de error.
  */
 export async function sendContactEmail({ name, email, message }: ContactData) {
-  // Definimos las opciones del correo
+  // Definimos las opciones del correo que se enviará desde la vista de contacto.
   const mailOptions = {
     from: `"Contacto desde Turnero Taller Mecánica Avanzada (Shift-Application)" <${EMAIL_USER}>`,
-    to: RECEIVER_EMAIL,
+    to: RECEIVER_EMAIL, // Destinatario configurado en las variables de entorno
     subject: "Nuevo mensaje de contacto",
     text:
       `Has recibido un nuevo mensaje desde el formulario de contacto de Taller Mecánica Avanzada:\n\n` +
@@ -47,7 +47,7 @@ export async function sendContactEmail({ name, email, message }: ContactData) {
       `Mensaje:\n${message}`,
   };
 
-  // Enviamos el correo y retornamos la promesa
+  // Enviamos el correo y retornamos la promesa.
   return transporter.sendMail(mailOptions);
 }
 
@@ -59,7 +59,7 @@ interface AppointmentData {
   appointmentId: number; // ID generado para el turno
   date: string;          // Fecha del turno (en formato ISO)
   time: string;          // Hora del turno (por ejemplo, "10:00 AM")
-  userName: string;      // Nombre del usuario, para personalizar el correo
+  userName: string;      // Nombre del usuario para personalizar el correo
   userEmail: string;     // Email del usuario (destinatario del correo)
 }
 
@@ -67,18 +67,18 @@ interface AppointmentData {
  * sendAppointmentConfirmationEmail
  * Envía un correo de confirmación al usuario cuando se crea un nuevo turno.
  *
- * Esta función construye un correo con los datos del turno (fecha, hora e ID) y
- * lo envía al correo del usuario para confirmar que el turno fue creado exitosamente.
+ * Esta función construye un correo con los datos del turno (fecha, hora e ID) y lo envía al correo del usuario para confirmar
+ * que el turno fue creado exitosamente.
  *
  * @param {AppointmentData} appointment - Objeto que contiene los datos del turno y del usuario.
  * @returns {Promise} Promesa que se resuelve cuando el correo se envía o se rechaza en caso de error.
  */
 export async function sendAppointmentConfirmationEmail(appointment: AppointmentData) {
-  // Definimos las opciones del correo de confirmación de turno
+  // Opciones del correo de confirmación
   const mailOptions = {
     from: `"Turno Confirmado - Taller Mecánica Avanzada" <${EMAIL_USER}>`,
-    to: appointment.userEmail,
-    subject: `Confirmación de turno #${appointment.appointmentId}`,
+    to: appointment.userEmail, // Destinatario: correo del usuario
+    subject: `Confirmación de turno #${appointment.appointmentId}`, // Asunto con el número de turno
     text:
       `Hola ${appointment.userName},\n\n` +
       `Tu turno ha sido reservado exitosamente.\n\n` +
@@ -90,7 +90,7 @@ export async function sendAppointmentConfirmationEmail(appointment: AppointmentD
       `Taller Mecánica Avanzada`,
   };
 
-  // Enviamos el correo utilizando el transportador configurado y retornamos la promesa
+  // Enviamos el correo utilizando el transportador y retornamos la promesa.
   return transporter.sendMail(mailOptions);
 }
 
@@ -110,14 +110,14 @@ interface AppointmentCancellationData {
  * sendAppointmentCancellationEmail
  * Envía un correo de confirmación al usuario cuando se cancela un turno.
  *
- * Esta función construye un correo con los datos del turno cancelado y
- * lo envía al correo del usuario para confirmar que el turno ha sido cancelado.
+ * Esta función construye un correo con los datos del turno cancelado y lo envía al correo del usuario para confirmar
+ * que el turno ha sido cancelado.
  *
  * @param {AppointmentCancellationData} appointment - Objeto que contiene los datos del turno y del usuario.
  * @returns {Promise} Promesa que se resuelve cuando el correo se envía o se rechaza en caso de error.
  */
 export async function sendAppointmentCancellationEmail(appointment: AppointmentCancellationData) {
-  // Definimos las opciones del correo de cancelación
+  // Opciones del correo de cancelación
   const mailOptions = {
     from: `"Turno Cancelado - Taller Mecánica Avanzada" <${EMAIL_USER}>`,
     to: appointment.userEmail,
@@ -130,7 +130,7 @@ export async function sendAppointmentCancellationEmail(appointment: AppointmentC
       `Taller Mecánica Avanzada`,
   };
 
-  // Enviamos el correo utilizando el mismo transportador configurado y retornamos la promesa
+  // Enviamos el correo utilizando el transportador y retornamos la promesa.
   return transporter.sendMail(mailOptions);
 }
 
@@ -157,7 +157,7 @@ interface AppointmentReminderData {
  * @returns {Promise} Promesa que se resuelve cuando el correo se envía o se rechaza en caso de error.
  */
 export async function sendAppointmentReminderEmail(appointment: AppointmentReminderData) {
-  // Definimos las opciones del correo de recordatorio
+  // Opciones del correo de recordatorio
   const mailOptions = {
     from: `"Recordatorio de turno - Taller Mecánica Avanzada" <${EMAIL_USER}>`,
     to: appointment.userEmail,
@@ -174,6 +174,6 @@ export async function sendAppointmentReminderEmail(appointment: AppointmentRemin
       `Taller Mecánica Avanzada`,
   };
 
-  // Enviamos el correo utilizando el transportador y retornamos la promesa
+  // Enviamos el correo utilizando el transportador y retornamos la promesa.
   return transporter.sendMail(mailOptions);
 }

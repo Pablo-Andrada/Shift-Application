@@ -1,36 +1,28 @@
 // src/views/Mis Turnos/MisTurnos.jsx
 import React, { useEffect, useState } from "react";
+// Importamos los estilos locales
 import styles from "./MisTurnos.module.css";
+// Importamos el hook de contexto para acceder al usuario logueado
 import useUserContext from "../../hooks/useUserContext";
+// Importamos el componente AppointmentCard para mostrar cada turno
 import AppointmentCard from "../../components/AppointmentCard/AppointmentCard";
 
 /**
- * Función auxiliar para construir un string ISO que incluya fecha y hora,
- * evitando que el turno quede desfasado por la zona horaria.
- *
- * @param {string} dateStr - Fecha en formato "YYYY-MM-DD" del input type="date".
- * @param {string} timeStr - Hora en formato "HH:MM" del input type="time".
- * @returns {string} Una cadena en formato ISO que el backend interpretará correctamente.
- */
-const buildISODateTime = (dateStr, timeStr) => {
-  // Creamos un objeto Date a partir de la combinación
-  const dateObj = new Date(`${dateStr}T${timeStr}:00`);
-  // Ajustamos (restamos) el timezoneOffset para que el backend reciba la fecha "real"
-  const localTime = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000);
-  // Retornamos en formato ISO
-  return localTime.toISOString();
-};
-
-/**
  * Componente MisTurnos
- * Muestra y crea los turnos asociados al usuario logueado.
+ * Muestra los turnos asociados al usuario logueado.
+ * Si el usuario no está logueado, no se debe acceder a esta vista (está protegida en App.jsx).
  */
 const MisTurnos = () => {
+  // Obtenemos el usuario actual desde el contexto global
   const { user } = useUserContext();
 
+  // Estado para almacenar los turnos del usuario
   const [appointments, setAppointments] = useState([]);
+  // Estado para manejar errores en la petición
   const [error, setError] = useState(null);
+  // Estado para saber si estamos cargando los turnos
   const [loading, setLoading] = useState(true);
+  // Estado para el filtro de turnos (todos, active, cancelled)
   const [filterStatus, setFilterStatus] = useState("todos");
 
   // Estados para controlar el modal de creación de turno
@@ -40,10 +32,11 @@ const MisTurnos = () => {
 
   /**
    * useEffect:
-   * Carga la lista de turnos del usuario.
+   * Al montar el componente, realiza una petición al backend para obtener los turnos del usuario.
+   * Se guarda el arreglo de turnos en 'appointments'.
    */
   useEffect(() => {
-    if (!user) return;
+    if (!user) return; // Si no hay usuario, no hacemos nada
 
     const fetchAppointments = async () => {
       try {
@@ -67,7 +60,7 @@ const MisTurnos = () => {
 
   /**
    * handleFilterChange:
-   * Actualiza el estado de filtro (todos, activos, cancelados).
+   * Actualiza el estado del filtro cuando el usuario selecciona una opción en el select.
    */
   const handleFilterChange = (e) => {
     setFilterStatus(e.target.value);
@@ -75,7 +68,7 @@ const MisTurnos = () => {
 
   /**
    * filteredAppointments:
-   * Aplica el filtro sobre appointments (según estado).
+   * Aplica el filtro de estado a la lista de turnos.
    */
   const filteredAppointments =
     filterStatus === "todos"
@@ -84,12 +77,16 @@ const MisTurnos = () => {
 
   /**
    * handleCancel:
-   * Cancela un turno (PUT /appointments/cancel/:id) y actualiza el estado local.
+   * Función para cancelar un turno.
+   * Envía una petición PUT al backend para actualizar el estado del turno a "cancelled"
+   * y actualiza el estado local de los turnos.
+   *
+   * @param {number} id - ID del turno a cancelar.
    */
   const handleCancel = async (id) => {
-    const confirmAction = window.confirm("¿Estás seguro que querés cancelar este turno?");
-    if (!confirmAction) return;
-
+    // Preguntamos al usuario si realmente quiere cancelar el turno
+    const confirm = window.confirm("¿Estás seguro que querés cancelar este turno?");
+    if (!confirm) return;
     try {
       const response = await fetch(`http://localhost:3000/appointments/cancel/${id}`, {
         method: "PUT",
@@ -97,9 +94,11 @@ const MisTurnos = () => {
       if (!response.ok) {
         throw new Error("No se pudo cancelar el turno.");
       }
-      // Actualizamos localmente el estado a "cancelled"
-      setAppointments((prev) =>
-        prev.map((appt) => (appt.id === id ? { ...appt, status: "cancelled" } : appt))
+      // Actualizamos el estado: marcamos el turno como 'cancelled'
+      setAppointments((prevAppointments) =>
+        prevAppointments.map((appt) =>
+          appt.id === id ? { ...appt, status: "cancelled" } : appt
+        )
       );
     } catch (err) {
       console.error("Error al cancelar turno:", err.message);
@@ -109,32 +108,28 @@ const MisTurnos = () => {
 
   /**
    * handleCreateAppointment:
-   * Envía el nuevo turno al backend (POST /appointments/schedule)
-   * construyendo una fecha-hora ISO para evitar desfasajes.
+   * Envía el nuevo turno al backend y actualiza la lista de turnos si todo sale bien.
    */
   const handleCreateAppointment = async (e) => {
     e.preventDefault();
     try {
-      // Construimos la fecha-hora ISO a partir de newDate + newTime
-      const isoDateTime = buildISODateTime(newDate, newTime);
-
       const response = await fetch("http://localhost:3000/appointments/schedule", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          date: isoDateTime, // Enviamos la cadena ISO
-          time: newTime,     // Dejamos la cadena "HH:MM" + "AM/PM" si fuese el caso
+          date: newDate,
+          time: newTime,
           userId: user.id,
         }),
       });
       if (!response.ok) {
         throw new Error("No se pudo crear el turno.");
       }
-      // Obtenemos el turno recién creado
       const newAppointment = await response.json();
-      // Agregamos el turno a la lista
+      // Actualizamos la lista de turnos con el nuevo turno creado
       setAppointments((prev) => [...prev, newAppointment]);
-
       // Cerramos el modal y limpiamos los campos
       setIsModalOpen(false);
       setNewDate("");
@@ -164,8 +159,6 @@ const MisTurnos = () => {
           <option value="active">Activos</option>
           <option value="cancelled">Cancelados</option>
         </select>
-
-        {/* Botón para abrir el modal de nuevo turno */}
         <button className={styles.createButton} onClick={() => setIsModalOpen(true)}>
           + Nuevo Turno
         </button>
@@ -178,6 +171,7 @@ const MisTurnos = () => {
       {!loading && !error && filteredAppointments.length > 0 ? (
         <ul className={styles.appointmentList}>
           {filteredAppointments.map((appt) => (
+            // Se pasa handleCancel como prop al componente AppointmentCard para cancelar un turno
             <AppointmentCard
               key={appt.id}
               id={appt.id}
@@ -190,8 +184,11 @@ const MisTurnos = () => {
           ))}
         </ul>
       ) : (
-        !loading &&
-        !error && <p className={styles.noAppointments}>No hay turnos que coincidan con el filtro seleccionado.</p>
+        !loading && !error && (
+          <p className={styles.noAppointments}>
+            No hay turnos que coincidan con el filtro seleccionado.
+          </p>
+        )
       )}
 
       {/* Modal para crear nuevo turno */}

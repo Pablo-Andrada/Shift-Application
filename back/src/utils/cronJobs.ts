@@ -1,16 +1,18 @@
 // src/cronJobs.ts
 
 // Importamos 'node-cron' para programar tareas recurrentes.
+// Si ves errores de tipo, asegúrate de instalar @types/node-cron.
 import cron from "node-cron";
 // Importamos el servicio que obtiene todos los turnos de la base de datos.
-import { getAllAppointmentsService, updateAppointmentReminderSent } from "../services/appointmentService";
+import { getAllAppointmentsService } from "../services/appointmentService";
 // Importamos la función para enviar el correo de recordatorio al usuario.
-// Asegurate de haber agregado y exportado sendAppointmentReminderEmail en emailService.ts.
+// Asegúrate de que sendAppointmentReminderEmail esté correctamente exportado en emailService.ts.
 import { sendAppointmentReminderEmail } from "../services/emailService";
 
 /**
  * getDateWithoutTime:
- * Función auxiliar para obtener la fecha sin la hora, lo que nos permite comparar únicamente la fecha.
+ * Función auxiliar para obtener la fecha sin incluir la hora.
+ * Esto nos permite comparar únicamente la parte de la fecha.
  *
  * @param {Date} date - Objeto Date completo.
  * @returns {Date} Objeto Date ajustado a la medianoche (sin hora).
@@ -20,54 +22,71 @@ const getDateWithoutTime = (date: Date): Date => {
 };
 
 /**
- * sendRemindersJob:
- * Función que se encarga de revisar todos los turnos y enviar recordatorios por correo
- * a los usuarios que tengan un turno programado para mañana.
+ * sentReminders:
+ * Objeto en memoria para rastrear los turnos a los cuales ya se envió el recordatorio.
+ * Se utiliza para evitar envíos repetidos para el mismo turno.
  */
-const sendRemindersJob = async () => {
+const sentReminders: { [appointmentId: number]: boolean } = {};
+
+/**
+ * sendRemindersJob:
+ * Función encargada de revisar todos los turnos y, para aquellos que cumplan la condición de 
+ * que el recordatorio debe enviarse exactamente 24 horas antes del turno, envía el correo de recordatorio.
+ *
+ * La lógica es la siguiente:
+ * - Se obtienen todos los turnos mediante getAllAppointmentsService.
+ * - Para cada turno activo, se calcula el momento exacto del recordatorio restándole 24 horas (en milisegundos)
+ *   a la hora del turno.
+ * - Si el tiempo actual (en milisegundos) se encuentra dentro de una ventana de 1 minuto (0 a 60000 ms)
+ *   del momento del recordatorio, y además, no se haya enviado el recordatorio para ese turno,
+ *   se envía el correo de recordatorio y se marca ese turno en el objeto sentReminders.
+ */
+const sendRemindersJob = async (): Promise<void> => {
   try {
     // Obtenemos todos los turnos desde la base de datos.
     const appointments = await getAllAppointmentsService();
+    
+    // Obtenemos el tiempo actual en milisegundos.
+    const now = new Date().getTime();
 
-    // Obtenemos la fecha actual sin incluir la hora.
-    const today = getDateWithoutTime(new Date());
-    // Calculamos la fecha de mañana.
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Iteramos sobre cada turno.
+    for (const appt of appointments) {
+      // Solo procesamos turnos activos.
+      if (appt.status !== "active") continue;
 
-    // Filtramos los turnos cuya fecha (sin hora) es igual a la fecha de mañana.
-    // Y que no tengan el recordatorio ya enviado.
-    const appointmentsTomorrow = appointments.filter((appt) => {
-      const apptDate = new Date(appt.date);
-      const apptDateOnly = getDateWithoutTime(apptDate);
-      return (
-        apptDateOnly.getTime() === tomorrow.getTime() &&
-        appt.status === "active" &&
-        !appt.reminderSent // ✅ Solo si aún no se envió el recordatorio
-      );
-    });
+      // Obtenemos la hora del turno en milisegundos.
+      const appointmentTime = new Date(appt.date).getTime();
 
-    // Para cada turno programado para mañana, intentamos enviar un correo de recordatorio.
-    for (const appt of appointmentsTomorrow) {
-      if (appt.user) {
-        const appointmentData = {
-          appointmentId: appt.id,
-          date: new Date(appt.date).toISOString(),
-          time: appt.time,
-          userName: appt.user.name,
-          userEmail: appt.user.email,
-        };
-        try {
-          await sendAppointmentReminderEmail(appointmentData);
-          console.log(`✅ Recordatorio enviado para turno #${appt.id} a ${appt.user.email}`);
+      // Calculamos el momento de recordatorio: 24 horas antes del turno.
+      const reminderTime = appointmentTime - (24 * 60 * 60 * 1000);
 
-          // ✅ Marcamos el turno como recordatorio ya enviado
-          await updateAppointmentReminderSent(appt.id);
-        } catch (emailError: any) {
-          console.error(`❌ Error al enviar recordatorio para turno #${appt.id}:`, emailError.message || emailError);
+      // Calculamos la diferencia en milisegundos entre el tiempo actual y el momento de recordatorio.
+      const diff = now - reminderTime;
+
+      // Verificamos si el tiempo actual está dentro de la ventana de 1 minuto
+      // (entre 0 y 60000 ms) y que no se haya enviado todavía el recordatorio para este turno.
+      if (diff >= 0 && diff < 60000 && !sentReminders[appt.id]) {
+        if (appt.user) {
+          // Construimos el objeto de datos para enviar en el correo de recordatorio.
+          const appointmentData = {
+            appointmentId: appt.id,
+            date: new Date(appt.date).toISOString(), // Enviamos la fecha en formato ISO.
+            time: appt.time,
+            userName: appt.user.name,
+            userEmail: appt.user.email,
+          };
+          try {
+            // Enviamos el correo de recordatorio.
+            await sendAppointmentReminderEmail(appointmentData);
+            console.log(`✅ Recordatorio enviado para turno #${appt.id} a ${appt.user.email}`);
+            // Marcamos este turno como notificado para evitar envíos repetidos.
+            sentReminders[appt.id] = true;
+          } catch (emailError: any) {
+            console.error(`❌ Error al enviar recordatorio para turno #${appt.id}:`, emailError.message || emailError);
+          }
+        } else {
+          console.warn(`⚠️ Turno #${appt.id} sin usuario asociado, no se pudo enviar recordatorio.`);
         }
-      } else {
-        console.warn(`⚠️ Turno #${appt.id} sin usuario asociado, no se pudo enviar recordatorio.`);
       }
     }
   } catch (error) {
@@ -75,12 +94,11 @@ const sendRemindersJob = async () => {
   }
 };
 
-// Configuramos el cron job para que se ejecute cada minuto.
-// Nota: En producción podrías configurar un cron job con una expresión diferente (p.ej., una vez al día a una hora específica).
-cron.schedule("* * * * *", () => {
+
+cron.schedule("*/1 * * * *", () => {
   console.log("⏰ Ejecutando cron job para enviar recordatorios de turnos...");
   sendRemindersJob();
 });
 
-// Exportamos la función del cron job (opcional) para permitir iniciar o detener el job desde otros módulos.
+// Exportamos la función del cron job para permitir iniciar o detener el job desde otros módulos (opcional).
 export { sendRemindersJob };
