@@ -1,4 +1,4 @@
-/* AppointmentCard.module.css */
+/* src/components/AppointmentCard/AppointmentCard.module.css */
 
 /* Contenedor principal de la tarjeta */
 .card {
@@ -104,3 +104,12 @@
   transform: none;
 }
 
+/* Nueva clase para el contenedor de comentarios */
+.comments {
+  font-size: 0.9rem;
+  color: #333;
+  margin: 0.5rem 0;
+  padding: 0.3rem 0.6rem;
+  border-top: 1px dashed #ccc; /* Línea discontinua para separar */
+  min-height: 1.5rem; /* Reserva de espacio para mantener la simetría */
+}

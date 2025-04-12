@@ -3,6 +3,7 @@ interface AppointmentDto {
     time: string;  
     userId: number;
     status: "active" | "cancelled";
+    comentarios: string
 };
 
 export default AppointmentDto;

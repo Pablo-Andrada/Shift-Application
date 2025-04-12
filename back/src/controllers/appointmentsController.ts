@@ -58,12 +58,13 @@ export const getAppointmentIdController = async (req: Request, res: Response) =>
  */
 export const createAppointmentController = async (req: Request, res: Response) => {
   try {
-    const { date, time, userId } = req.body;
+    const { date, time, userId,comentarios } = req.body;
     // Convertimos `date` a un objeto Date y `userId` a number
     const newAppointment: Appointment | null = await createAppointmentService(
       new Date(date),
       time,
-      Number(userId)
+      Number(userId),
+      comentarios
     );
 
     if (!newAppointment) {
@@ -79,6 +80,7 @@ export const createAppointmentController = async (req: Request, res: Response) =
         time: newAppointment.time,
         userName: newAppointment.user.name,
         userEmail: newAppointment.user.email,
+        comentarios: (newAppointment as any).comentarios || ""
       };
 
       try {
@@ -129,6 +131,7 @@ export const updateAppointmentController = async (req: Request, res: Response) =
         time: appointment.time,
         userName: appointment.user.name,
         userEmail: appointment.user.email,
+        
       };
       try {
         await sendAppointmentCancellationEmail(cancellationData);
