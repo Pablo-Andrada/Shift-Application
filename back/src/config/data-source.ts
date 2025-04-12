@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
     username: "postgres",
     password: "admin",
     database: "shift_aplication",
-    // dropSchema: true,   //esta linea sirve para reiniciar la base de datos, es decir los usuarios y vehicles
+    dropSchema: false,   //esta linea sirve para reiniciar la base de datos, es decir los usuarios y vehicles
     synchronize: true,
     logging: false,
     entities: [User,Appointment,Credential],

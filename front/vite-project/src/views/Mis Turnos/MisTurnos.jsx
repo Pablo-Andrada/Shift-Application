@@ -1,3 +1,4 @@
+// // export default MisTurnos;
 // // src/views/Mis Turnos/MisTurnos.jsx
 // import React, { useEffect, useState } from "react";
 // // Importamos los estilos locales
@@ -29,6 +30,8 @@
 //   const [isModalOpen, setIsModalOpen] = useState(false);
 //   const [newDate, setNewDate] = useState("");
 //   const [newTime, setNewTime] = useState("");
+//   // NUEVO ESTADO: Comentarios para el turno (máximo 50 caracteres)
+//   const [newComentarios, setNewComentarios] = useState("");
 
 //   /**
 //    * useEffect:
@@ -109,6 +112,7 @@
 //   /**
 //    * handleCreateAppointment:
 //    * Envía el nuevo turno al backend y actualiza la lista de turnos si todo sale bien.
+//    * Se incluye el campo "comentarios" en la petición.
 //    */
 //   const handleCreateAppointment = async (e) => {
 //     e.preventDefault();
@@ -118,10 +122,12 @@
 //         headers: {
 //           "Content-Type": "application/json",
 //         },
+//         // Se envían: date, time, userId y comentarios.
 //         body: JSON.stringify({
 //           date: newDate,
 //           time: newTime,
 //           userId: user.id,
+//           comentarios: newComentarios, // NUEVO: Enviamos los comentarios en la solicitud.
 //         }),
 //       });
 //       if (!response.ok) {
@@ -130,10 +136,11 @@
 //       const newAppointment = await response.json();
 //       // Actualizamos la lista de turnos con el nuevo turno creado
 //       setAppointments((prev) => [...prev, newAppointment]);
-//       // Cerramos el modal y limpiamos los campos
+//       // Cerramos el modal y limpiamos los campos (incluyendo comentarios)
 //       setIsModalOpen(false);
 //       setNewDate("");
 //       setNewTime("");
+//       setNewComentarios("");
 //     } catch (err) {
 //       console.error("Error al crear turno:", err.message);
 //       setError(err.message);
@@ -171,7 +178,8 @@
 //       {!loading && !error && filteredAppointments.length > 0 ? (
 //         <ul className={styles.appointmentList}>
 //           {filteredAppointments.map((appt) => (
-//             // Se pasa handleCancel como prop al componente AppointmentCard para cancelar un turno
+//             // Se pasa handleCancel como prop al componente AppointmentCard para cancelar un turno.
+//             // Se envía también la propiedad "comentarios" para que se muestre en la tarjeta.
 //             <AppointmentCard
 //               key={appt.id}
 //               id={appt.id}
@@ -179,12 +187,14 @@
 //               time={appt.time}
 //               userId={appt.userId}
 //               status={appt.status}
+//               comentarios={appt.comentarios} // NUEVO: Pasamos los comentarios al componente
 //               onCancel={handleCancel}
 //             />
 //           ))}
 //         </ul>
 //       ) : (
-//         !loading && !error && (
+//         !loading &&
+//         !error && (
 //           <p className={styles.noAppointments}>
 //             No hay turnos que coincidan con el filtro seleccionado.
 //           </p>
@@ -215,6 +225,17 @@
 //                   required
 //                 />
 //               </label>
+//               {/* NUEVO CAMPO: Comentarios (opcional, máximo 50 caracteres) */}
+//               <label>
+//                 Comentarios (máx. 50 caracteres):
+//                 <input
+//                   type="text"
+//                   value={newComentarios}
+//                   maxLength={50}
+//                   onChange={(e) => setNewComentarios(e.target.value)}
+//                   placeholder="Escribe un comentario (opcional)"
+//                 />
+//               </label>
 //               <div className={styles.modalActions}>
 //                 <button type="submit">Guardar</button>
 //                 <button type="button" onClick={() => setIsModalOpen(false)}>
@@ -230,6 +251,7 @@
 // };
 
 // export default MisTurnos;
+
 // src/views/Mis Turnos/MisTurnos.jsx
 import React, { useEffect, useState } from "react";
 // Importamos los estilos locales
@@ -238,6 +260,8 @@ import styles from "./MisTurnos.module.css";
 import useUserContext from "../../hooks/useUserContext";
 // Importamos el componente AppointmentCard para mostrar cada turno
 import AppointmentCard from "../../components/AppointmentCard/AppointmentCard";
+// Importamos la función toast de react-toastify para mostrar notificaciones en vez del popup nativo
+import { toast } from "react-toastify";
 
 /**
  * Componente MisTurnos
@@ -315,12 +339,14 @@ const MisTurnos = () => {
    * Envía una petición PUT al backend para actualizar el estado del turno a "cancelled"
    * y actualiza el estado local de los turnos.
    *
+   * En lugar de usar window.confirm (popup feo), se muestra un mensaje de notificación usando toast.
+   *
    * @param {number} id - ID del turno a cancelar.
    */
   const handleCancel = async (id) => {
-    // Preguntamos al usuario si realmente quiere cancelar el turno
-    const confirm = window.confirm("¿Estás seguro que querés cancelar este turno?");
-    if (!confirm) return;
+    // Mostramos una notificación de confirmación amigable en lugar del popup nativo.
+    // Aquí podrías agregar un modal de confirmación personalizado si lo prefieres,
+    // pero en este ejemplo simplemente ejecutamos la cancelación y mostramos el resultado.
     try {
       const response = await fetch(`http://localhost:3000/appointments/cancel/${id}`, {
         method: "PUT",
@@ -334,9 +360,13 @@ const MisTurnos = () => {
           appt.id === id ? { ...appt, status: "cancelled" } : appt
         )
       );
+      // Mostramos un toast de éxito informando que el turno fue cancelado
+      toast.success("Turno cancelado exitosamente");
     } catch (err) {
       console.error("Error al cancelar turno:", err.message);
       setError(err.message);
+      // Notificamos el error al usuario mediante un toast
+      toast.error("Error al cancelar el turno");
     }
   };
 
@@ -424,8 +454,7 @@ const MisTurnos = () => {
           ))}
         </ul>
       ) : (
-        !loading &&
-        !error && (
+        !loading && !error && (
           <p className={styles.noAppointments}>
             No hay turnos que coincidan con el filtro seleccionado.
           </p>

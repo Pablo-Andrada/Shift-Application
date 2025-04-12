@@ -105,11 +105,14 @@
 }
 
 /* Nueva clase para el contenedor de comentarios */
+/* Se define un espacio fijo y se trunca el texto si es muy largo para mantener la simetría */
 .comments {
   font-size: 0.9rem;
   color: #333;
   margin: 0.5rem 0;
   padding: 0.3rem 0.6rem;
-  border-top: 1px dashed #ccc; /* Línea discontinua para separar */
-  min-height: 1.5rem; /* Reserva de espacio para mantener la simetría */
+  border-top: 1px dashed #ccc;
+  word-wrap: break-word;     /* Rompe palabras largas si es necesario */
+  overflow-wrap: break-word; /* Compatibilidad adicional para navegadores */
+  white-space: normal;       /* Permite que el texto salte de línea */
 }
