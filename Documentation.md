@@ -1,77 +1,161 @@
-# Proyecto de Turnos para Taller de Autos
+<!-- README.md -->
 
-Este proyecto es un sistema de turnos diseñado específicamente para talleres de autos. Permite gestionar turnos, almacenar información detallada sobre los clientes y sus vehículos, y llevar un control eficiente de los presupuestos y mejoras implementadas.
+# Shift‑Application
 
-## Características Principales
+**Shift‑Application** es una plataforma full‑stack para gestionar turnos en un taller mecánico. Permite a los clientes registrarse, iniciar sesión, agendar y cancelar turnos, y enviar consultas al taller.
 
-- **Gestión de Turnos**: Permite agendar y consultar turnos con detalles completos del cliente y el vehículo.
-- **Información del Cliente**: Registro de datos personales y de contacto.
-- **Detalles del Vehículo**: Descripción de los inconvenientes y mejoras implementadas.
-- **Presupuestos**: Generación y actualización de presupuestos para cada turno.
+---
 
-## Tecnologías Utilizadas
+## 🔍 Características
 
-- **Frontend**: React, TailwindCSS.
-- **Backend**: Node.js, Express.
-- **Base de Datos**: MongoDB. TypeORM, PostgreSQL.
+1. **Registro de Usuarios**
 
-## Instrucciones para Iniciar el Proyecto
+   - Formulario con nombre, email, fecha de nacimiento, DNI y contraseña.
+   - Guarda credenciales y perfil en PostgreSQL.
 
-1. Clona el repositorio desde GitHub:
+2. **Login & Sesión**
+
+   - Autenticación por email y contraseña.
+   - Persistencia de sesión en `localStorage` y Context API.
+
+3. **Home**
+
+   - Saludo personalizado.
+   - Widgets:
+     - Próximo turno activo.
+     - Historial rápido (últimos 3 turnos).
+     - Calendario interactivo con indicador de días con turnos.
+   - Botones de “Iniciar Sesión” y “Registrarse” (si no hay sesión).
+
+4. **Gestión de Turnos**
+
+   - **Crear Turno**: fecha, hora y comentarios opcionales.
+   - **Listar Turnos**: filtrar por estado (activos, cancelados).
+   - **Cancelar Turno**: cambia estado y notifica al usuario.
+
+5. **Rutas Protegidas**
+
+   - `/appointments` y `/crear-turno` solo accesibles con sesión activa.
+
+6. **Contacto**
+
+   - Formulario de consulta (nombre, email, mensaje).
+   - Envío de correo al taller y notificaciones con `react-toastify`.
+
+7. **About**
+
+   - Carrusel de imágenes.
+   - Mapa embebido de Google Maps con ubicación del taller.
+
+8. **Emails Automáticos**
+   - Confirmación al crear turno.
+   - Aviso al cancelar turno.
+   - Recordatorios 24 h antes (cron job).
+
+---
+
+## 🛠 Tecnologías
+
+- **Backend**
+
+  - Node.js + Express
+  - TypeScript
+  - TypeORM + PostgreSQL
+  - Nodemailer (Gmail)
+  - Cron jobs (node-cron)
+
+- **Frontend**
+  - React + Vite
+  - React Router
+  - CSS Modules
+  - Context API (User & Appointment)
+  - react-calendar
+  - react-toastify
+
+---
+
+## 🚀 Instalación y Ejecución
+
+1. Clona el repositorio
+
    ```bash
-   git clone https://github.com/tu-usuario/turnos-taller-autos.git
+   git clone https://github.com/tu-usuario/shift-application.git
+
    ```
-2. Accede al directorio del proyecto:
-   ```bash
-   cd turnos-taller-autos
-   ```
-3. Instala las dependencias necesarias:
-   ```bash
+
+2. Backend  
+   cd shift-application/back
    npm install
-   ```
-4. Configura las variables de entorno en un archivo `.env` basado en el archivo `.env.example` proporcionado.
-5. Inicia el servidor de desarrollo:
-   ```bash
-   npm start
-   ```
 
-## Capturas de Pantalla
+# Crear archivo .env con:
 
-_Aquí puedes agregar capturas de pantalla del sistema para ilustrar cómo funciona._
+# EMAIL_USER, EMAIL_PASSWORD, RECEIVER_EMAIL, PORT, DATABASE_URL, etc.
 
-## Contribuciones
+npm start
 
-Las contribuciones son bienvenidas. Si tienes sugerencias o mejoras, por favor abre un issue o envía un pull request.
+El servidor quedará escuchando en http://localhost:3000
 
-## Autor
+3. Front  
+   cd shift-application/front
+   npm install
+   npm run dev
 
-Creado por [Tu Nombre](https://github.com/tu-usuario).
+Abre http://localhost:5173 (o el puerto que muestre Vite).
 
-## Licencia
+Estructura de carpetas:
+shift-application/
+├─ back/ # Backend (Express + TypeORM)
+│ ├─ src/
+│ │ ├─ config/ # DataSource, variables de entorno
+│ │ ├─ entities/ # User, Credential, Appointment
+│ │ ├─ dtos/ # Data Transfer Objects
+│ │ ├─ services/ # Lógica de negocio y acceso a BD
+│ │ ├─ controllers/ # Handlers de rutas
+│ │ ├─ routes/ # Definición de endpoints
+│ │ ├─ utils/ # Cron jobs (recordatorios)
+│ │ ├─ emailService.ts # Plantillas y envío de correos
+│ │ ├─ server.ts # Configuración de Express
+│ │ └─ index.ts # Inicialización de DB y servidor
+│ └─ package.json
+│
+└─ front/ # Frontend (React + Vite)
+├─ src/
+│ ├─ components/ # Componentes reutilizables (Modal, NavBar, Cards…)
+│ ├─ views/ # Páginas (Home, Login, Register, MisTurnos, About, Contact)
+│ ├─ context/ # Context API (UserContext, AppointmentContext)
+│ ├─ hooks/ # Custom hooks para contextos
+│ ├─ App.jsx # Rutas y layout principal
+│ ├─ main.jsx # Punto de entrada (ReactDOM)
+│ └─ index.css # Estilos globales
+└─ package.json
 
-Este proyecto está licenciado bajo la [MIT License](LICENSE).
+⚙ Uso Básico
+-Registro
 
-## Documentación de creación del proyecto:
+      Navega a “Registrarse” y completa el formulario.
 
-### General:
+      Al enviar, se crea tu perfil y sesión.
 
--1 Creé la carpeta del proyecto: - Creo la carpeta del proyecto, dentro del mismo, dos carpetas más, una del "Back", otra del "Front" y ademas 2 archivos, un .gitignore y un Documentation.md, justamente este mismo archivo
+-Login
 
-### Back:
+      Ve a “Iniciar Sesión” e ingresa tu email y contraseña.
 
-1- Generamos el package.json:
-con npm init -y
-2- Instalamos typescript localmente:
-npm install typescript --save-dev
-3- Generamos el archivo tsconfig.json con el comando:
-tsc --init
-4- Ajusto en tsconfig.json las configuraciones:
-a- Descomento "outDir":"./dist"
-b- Al final del ts config escribo:
-"files":["./src/index.ts"] (aca indico que archivo ts quiero traducir a js, para que no traduzca todos los .ts que encuentre)
-5- Configuro el comando build para que ejecute el compilador de TypeScript y el comando start para que ejecute dicho build:
-"scripts":{
-"build":"tsc", // npm run build
-"start":"node ./dist/index.js" , // npm start
-}
-6- Crear la carpeta src del proyecto y el módulo index.ts.
+      Al autenticarte, accedes a tus turnos.
+
+-Agendar Turno
+
+      Desde “Mis Turnos” haz clic en “+ Nuevo Turno”.
+
+      Selecciona fecha, hora y agrega un comentario opcional.
+
+-Cancelar Turno
+
+      En la lista de turnos, pulsa “Cancelar turno” en la tarjeta correspondiente.
+
+-Contacto
+
+      Completa el formulario en “Contacto” para enviar tu consulta.
+
+-About
+
+      Explora la historia del taller, carrusel de fotos y mapa de ubicación.
