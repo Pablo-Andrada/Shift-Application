@@ -6,105 +6,105 @@ import { useNavigate } from "react-router-dom";
 
 /**
  * Componente Login
- * Muestra un formulario controlado para iniciar sesión.
- * Si el login es exitoso, guarda el usuario en el contexto global, redirecciona a la página principal
- * y cierra automáticamente el modal (si se pasa la prop onClose).
+ * Muestra un formulario de inicio de sesión.
+ * Si el login es exitoso, guarda el usuario en el contexto global,
+ * cierra el modal (si se pasa la prop onClose) y redirecciona al Home.
  */
 const Login = ({ onClose }) => {
   const navigate = useNavigate();
   const { loginUser } = useUserContext();
 
-  // Estado para almacenar los datos del formulario (username y password)
-  const [formData, setFormData] = useState({ username: "", password: "" });
-  // Estado para almacenar el mensaje de estado (éxito o error)
+  // Estado para almacenar los datos del formulario
+  // Ahora usamos "email" en lugar de "username" para coincidir con el backend
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  // Estado para almacenar mensajes de estado (éxito o error)
   const [statusMessage, setStatusMessage] = useState("");
-  // Estado para indicar si el mensaje es de error
   const [isError, setIsError] = useState(false);
 
+  // Log para verificar que el componente se cargó
+  console.log("Login component loaded");
+
   /**
-   * handleChange: Actualiza el estado del formulario cada vez que el usuario escribe en un input.
-   * @param {React.ChangeEvent<HTMLInputElement>} e - El evento del input.
+   * handleChange:
+   * Actualiza el estado del formulario conforme el usuario escribe.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement>} e - Evento de cambio en el input.
    */
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    console.log(`Campo ${e.target.name} actualizado:`, e.target.value);
   };
 
   /**
-   * handleSubmit: Se ejecuta al enviar el formulario.
-   * Realiza una petición POST al endpoint de login del backend con las credenciales ingresadas.
-   * Si el login es exitoso, guarda el usuario en el contexto global, redirecciona y cierra el modal.
-   * @param {React.FormEvent<HTMLFormElement>} e - El evento del formulario.
+   * handleSubmit:
+   * Envía la petición de inicio de sesión al backend y maneja la respuesta.
+   *
+   * @param {React.FormEvent<HTMLFormElement>} e - Evento del formulario.
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { username, password } = formData;
+    const { email, password } = formData;
+    console.log("Handle submit triggered con:", { email, password });
 
-    // Validamos que ambos campos estén completos
-    if (!username || !password) {
+    // Validación básica: ambos campos deben estar completos.
+    if (!email || !password) {
       setStatusMessage("Por favor complete todos los campos.");
       setIsError(true);
       return;
     }
-
+    
     try {
-      // Realizamos la petición POST al endpoint de login (asegúrate de usar la URL correcta)
+      console.log("Enviando solicitud de login al backend...");
       const response = await fetch("http://localhost:3000/user/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ email, password })
       });
 
       // Convertimos la respuesta a JSON
       const data = await response.json();
-      console.log("📌 DATA desde backend:", data);
+      console.log("Respuesta del backend:", data);
 
+      // Si la respuesta no es ok o no contiene el objeto usuario, mostramos error
       if (!response.ok || !data.user) {
-        setStatusMessage(data.error || "Error al iniciar sesión.");
+        // Usamos data.message que devuelve el backend
+        setStatusMessage(data.message || "Error al iniciar sesión.");
         setIsError(true);
+        console.error("Error en la respuesta de login:", data.message);
       } else {
         setStatusMessage(data.message || "Login exitoso.");
         setIsError(false);
-
+        console.log("Usuario logueado correctamente:", data.user);
         // Guardamos el usuario en el contexto global
         loginUser(data.user);
-
-        // Llamamos a la función onClose (si se pasó) para cerrar el modal
+        // Si se pasó onClose (por ejemplo, si se está usando dentro de un modal), lo cerramos
         if (onClose) onClose();
-
-        // Redireccionamos al home
+        // Redireccionamos al Home
         navigate("/");
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error en la petición de login:", error);
       setStatusMessage("Error al conectar con el servidor.");
       setIsError(true);
     }
   };
 
-  // Validamos que ambos campos tengan valor para habilitar el botón
-  const isFormValid = formData.username && formData.password;
-
   return (
     <div className={styles.container}>
-      {/* Título de la vista de login */}
       <h1 className={styles.title}>Iniciar Sesión</h1>
-
-      {/* Si existe un mensaje de estado, se muestra en un div */}
       {statusMessage && (
         <div className={isError ? styles.errorMessage : styles.successMessage}>
           {statusMessage}
         </div>
       )}
-
-      {/* Formulario controlado para login */}
-      <form className={styles.form} onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.formGroup}>
-          <label htmlFor="username">email:</label>
+          <label htmlFor="email">Email:</label>
           <input
             type="text"
-            id="username"
-            name="username"
-            value={formData.username}
+            id="email"
+            name="email"
+            value={formData.email}
             onChange={handleChange}
             required
           />
@@ -120,15 +120,9 @@ const Login = ({ onClose }) => {
             required
           />
         </div>
-        {isFormValid ? (
-          <button type="submit" className={styles.submitButton}>
-            Iniciar Sesión
-          </button>
-        ) : (
-          <p className={styles.infoMessage}>
-            Complete ambos campos para iniciar sesión.
-          </p>
-        )}
+        <button type="submit" className={styles.submitButton}>
+          Iniciar Sesión
+        </button>
       </form>
     </div>
   );

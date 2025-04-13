@@ -1,56 +1,85 @@
 /* src/views/Contact/Contact.module.css */
 .container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: Arial, sans-serif;
-    color: #333;
-  }
-  
-  .title {
-    text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-    color: #222;
-  }
-  
-  .contactForm {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-  
-  .formGroup {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .formGroup label {
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-  }
-  
-  .formGroup input,
-  .formGroup textarea {
-    padding: 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  
-  .submitButton {
-    align-self: flex-start;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 0.7rem 1.2rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .submitButton:hover {
-    background-color: #0056b3;
-  }
-  
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #222;
+}
+
+/* Nuevo subtítulo para la información de contacto */
+.subtitle {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #555;
+}
+
+.phone {
+  font-weight: bold;
+  color: #222;
+}
+
+.contactForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.formGroup input,
+.formGroup textarea {
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.submitButton {
+  align-self: center;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover {
+  background-color: #0056b3;
+}
+
+/* Estilos para el enlace de WhatsApp */
+.whatsappLink {
+  text-decoration: none; /* Sin subrayado */
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.whatsappIcon {
+  font-size: 2rem; /* Aumentamos el tamaño del ícono a 2rem */
+  color: #25d366;   /* Color verde característico de WhatsApp */
+  transition: transform 0.2s;
+}
+
+.whatsappIcon:hover {
+  transform: scale(1.1);
+}
