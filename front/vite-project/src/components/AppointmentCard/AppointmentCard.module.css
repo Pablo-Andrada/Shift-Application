@@ -35,26 +35,31 @@
 }
 
 /* Botón para descartar la tarjeta (close) */
+/* Se actualizó el estilo para crear un botón con más estilo, con fondo redondo, sombra y efecto hover */
 .closeButton {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background-color: #ff4d4d;
+  color: #fff;
+  font-size: 1rem;
   font-weight: bold;
-  color: #333;
-  background-color: rgba(255, 255, 255, 0.7);
   border-radius: 50%;
-  width: 1.2rem;
-  height: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   z-index: 2;
-  transition: background-color 0.2s;
 }
 
 .closeButton:hover {
-  background-color: rgba(255, 255, 255, 1);
+  background-color: #e60000;
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* Efecto hover: la tarjeta se eleva ligeramente */

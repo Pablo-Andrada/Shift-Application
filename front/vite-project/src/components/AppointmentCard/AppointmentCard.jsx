@@ -44,12 +44,13 @@ const AppointmentCard = ({
   return (
     <div className={styles.card}>
       {/* Botón "x" para descartar la tarjeta. Se posiciona en la esquina superior derecha */}
-      <div
+      <button
         className={styles.closeButton}
         onClick={() => onDismiss && onDismiss(id)}
+        title="Eliminar turno"
       >
         x
-      </div>
+      </button>
 
       <p>
         <strong>ID:</strong> {id}
@@ -63,11 +64,7 @@ const AppointmentCard = ({
       <p>
         <strong>Usuario ID:</strong> {userId}
       </p>
-      <p
-        className={`${styles.state} ${
-          status === "active" ? styles.active : styles.cancelled
-        }`}
-      >
+      <p className={`${styles.state} ${status === "active" ? styles.active : styles.cancelled}`}>
         <strong>Estado:</strong> {status}
       </p>
 
