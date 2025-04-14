@@ -5,6 +5,7 @@ import {
   createAppointmentController,
   updateAppointmentController,
   getAppointmentsByUserController,
+  deleteAppointmentController
 } from "../controllers/appointmentsController";
 
 export const appointmentsRouter = Router();
@@ -23,3 +24,6 @@ appointmentsRouter.put("/cancel/:id", updateAppointmentController);
 
 // GET /appointments/user/:userId
 appointmentsRouter.get("/user/:userId", getAppointmentsByUserController);
+
+// DELETE /appointments/:id  --> Nueva ruta para eliminar un turno
+appointmentsRouter.delete("/:id", deleteAppointmentController);

@@ -1,9 +1,7 @@
-/* src/components/AppointmentCard/AppointmentCard.module.css */
-
 /* Contenedor principal de la tarjeta */
 .card {
   background-image: url("../../assets/images/Gestion-de-Turnos.png");
-  position: relative; /* Para posicionar el overlay */
+  position: relative; /* Para posicionar el overlay y el botón de cerrar */
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 1.2rem;
@@ -25,16 +23,38 @@
   left: 0;
   width: 100%;
   height: 100%;
-  /* Overlay blanco con opacidad: ajusta el valor según necesites */
   background-color: rgba(255, 255, 255, 0.85);
   z-index: 0;
-  border-radius: 8px; /* Aseguramos que el overlay respete el borde redondeado */
+  border-radius: 8px;
 }
 
 /* Aseguramos que el contenido de la tarjeta quede por encima del overlay */
 .card > * {
   position: relative;
   z-index: 1;
+}
+
+/* Botón para descartar la tarjeta (close) */
+.closeButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-weight: bold;
+  color: #333;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  width: 1.2rem;
+  height: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 1);
 }
 
 /* Efecto hover: la tarjeta se eleva ligeramente */
@@ -67,19 +87,19 @@
 
 /* Estilo para turno ACTIVO */
 .active {
-  background-color: #d4edda; /* fondo verde claro */
-  color: #155724; /* texto verde oscuro */
+  background-color: #d4edda;
+  color: #155724;
 }
 
 /* Estilo para turno CANCELADO */
 .cancelled {
-  background-color: #f8d7da; /* fondo rojo claro */
-  color: #721c24; /* texto rojo oscuro */
+  background-color: #f8d7da;
+  color: #721c24;
 }
 
 /* Estilos para el botón de cancelar turno */
 .cancelButton {
-  background-color: #dc3545; /* rojo para cancelar */ 
+  background-color: #dc3545;
   color: white;
   border: none;
   padding: 0.3rem 0.6rem;
@@ -87,16 +107,14 @@
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.2s, transform 0.2s;
-  margin-left: 1rem; /* separa el botón del estado */
+  margin-left: 1rem;
 }
 
-/* Efecto hover para el botón */
 .cancelButton:hover {
   background-color: #c82333;
   transform: scale(1.05);
 }
 
-/* Estilo del botón cuando está deshabilitado */
 .cancelButton:disabled {
   background-color: #ccc;
   color: #666;
@@ -104,15 +122,14 @@
   transform: none;
 }
 
-/* Nueva clase para el contenedor de comentarios */
-/* Se define un espacio fijo y se trunca el texto si es muy largo para mantener la simetría */
+/* Contenedor de comentarios */
 .comments {
   font-size: 0.9rem;
   color: #333;
   margin: 0.5rem 0;
   padding: 0.3rem 0.6rem;
   border-top: 1px dashed #ccc;
-  word-wrap: break-word;     /* Rompe palabras largas si es necesario */
-  overflow-wrap: break-word; /* Compatibilidad adicional para navegadores */
-  white-space: normal;       /* Permite que el texto salte de línea */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }

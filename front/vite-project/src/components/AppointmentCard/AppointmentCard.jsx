@@ -1,4 +1,3 @@
-// src/components/AppointmentCard/AppointmentCard.jsx
 import React from "react";
 import styles from "./AppointmentCard.module.css";
 
@@ -29,11 +28,29 @@ const adjustDate = (dateInput) => {
  * @param {"active"|"cancelled"} props.status - Estado del turno.
  * @param {string} [props.comentarios] - (Opcional) Comentarios del turno (máx 50 caracteres).
  * @param {function} props.onCancel - Función a ejecutar para cancelar el turno.
+ * @param {function} props.onDismiss - Función a ejecutar para descartar la tarjeta de la lista.
  * @returns {JSX.Element} Un elemento JSX que representa la tarjeta del turno.
  */
-const AppointmentCard = ({ id, date, time, userId, status, comentarios, onCancel }) => {
+const AppointmentCard = ({
+  id,
+  date,
+  time,
+  userId,
+  status,
+  comentarios,
+  onCancel,
+  onDismiss,
+}) => {
   return (
     <div className={styles.card}>
+      {/* Botón "x" para descartar la tarjeta. Se posiciona en la esquina superior derecha */}
+      <div
+        className={styles.closeButton}
+        onClick={() => onDismiss && onDismiss(id)}
+      >
+        x
+      </div>
+
       <p>
         <strong>ID:</strong> {id}
       </p>
@@ -46,14 +63,18 @@ const AppointmentCard = ({ id, date, time, userId, status, comentarios, onCancel
       <p>
         <strong>Usuario ID:</strong> {userId}
       </p>
-      <p className={`${styles.state} ${status === "active" ? styles.active : styles.cancelled}`}>
+      <p
+        className={`${styles.state} ${
+          status === "active" ? styles.active : styles.cancelled
+        }`}
+      >
         <strong>Estado:</strong> {status}
       </p>
 
       {/* 
         NUEVA SECCIÓN: Comentarios 
-        - Se muestra con un espacio fijo para que todas las tarjetas con o sin comentarios 
-          luzcan uniformes.
+        Se muestra con un espacio fijo para que todas las tarjetas con o sin comentarios 
+        luzcan uniformes.
       */}
       <div className={styles.comments}>
         <strong>Comentarios:</strong>{" "}

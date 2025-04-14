@@ -4,6 +4,7 @@ import {
   getAppointmentByIdService,
   createAppointmentService,
   cancelAppointmentService,
+  deleteAppointmentService
 } from "../services/appointmentService";
 import { Appointment } from "../entities/Appointment";
 import { getAppointmentsByUserIdService } from "../services/appointmentService";
@@ -166,6 +167,26 @@ export const getAppointmentsByUserController = async (req: Request, res: Respons
   } catch (error) {
     res.status(500).json({
       message: "Error al obtener los turnos del usuario",
+      error,
+    });
+  }
+};
+/**
+ * DELETE /appointments/:id
+ * Elimina un turno de la base de datos.
+ */
+export const deleteAppointmentController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    // Llamamos al service para eliminar el turno
+    const success = await deleteAppointmentService(Number(id));
+    if (!success) {
+      return res.status(404).json({ message: "Turno no encontrado para eliminar" });
+    }
+    res.status(200).json({ message: "Turno eliminado exitosamente" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al eliminar el turno",
       error,
     });
   }

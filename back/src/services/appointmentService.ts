@@ -114,3 +114,23 @@ export const updateAppointmentReminderSent = async (appointmentId: number): Prom
   const appointmentRepo = AppDataSource.getRepository(Appointment);
   await appointmentRepo.update(appointmentId, { reminderSent: true });
 };
+
+/**
+ * DELETE Appointment:
+ * Elimina un turno de la base de datos.
+ *
+ * @param id - El ID del turno a eliminar.
+ * @returns true si se elimina el turno exitosamente; false si no existe.
+ */
+export async function deleteAppointmentService(id: number): Promise<boolean> {
+  // Buscamos el turno por su ID
+  const appointment = await AppointmentModel.findOneBy({ id });
+  if (!appointment) {
+    console.error("El turno con el ID especificado no existe.");
+    return false;
+  }
+
+  // Eliminamos el turno
+  await AppointmentModel.delete(id);
+  return true;
+}
