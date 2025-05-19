@@ -24,6 +24,8 @@
 
 // src/config/data-source.ts
 // src/config/data-source.ts
+// src/config/data-source.ts
+// src/config/data-source.ts
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { User } from '../entities/User';
@@ -32,21 +34,20 @@ import { Credential } from '../entities/Credential';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  url: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { 
-    rejectUnauthorized: false, // ✅ Ignora certificados no válidos
-    ca: '', // Fuerza a Node.js a no validar la cadena de certificados
-  } : false,
-  synchronize: false,
-  logging: false,
+  url: process.env.DATABASE_URL, // Usa la URL del Transaction Pooler
+  ssl: {
+    rejectUnauthorized: false, // ✅ Obligatorio para Supabase (certificado autofirmado)
+  },
+  synchronize: false, // 🚫 NUNCA en producción
+  logging: false, // Opcional: activar para depuración
   entities: [User, Appointment, Credential],
   migrations: [],
   extra: {
-    prepare: false // 🛑 ¡Mantén esto desactivado!
+    prepare: false // 🛑 Clave para el Transaction Pooler
   }
 });
 
-// Repositorios (sin cambios)
+// Repositorios (no modificar)
 export const UserModel = AppDataSource.getRepository(User);
 export const AppointmentModel = AppDataSource.getRepository(Appointment);
 export const CredentialModel = AppDataSource.getRepository(Credential);
