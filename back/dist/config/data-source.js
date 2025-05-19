@@ -24,6 +24,8 @@ exports.CredentialModel = exports.AppointmentModel = exports.UserModel = exports
 // export const CredentialModel = AppDataSource.getRepository(Credential);
 // src/config/data-source.ts
 // src/config/data-source.ts
+// src/config/data-source.ts
+// src/config/data-source.ts
 require("dotenv/config");
 const typeorm_1 = require("typeorm");
 const User_1 = require("../entities/User");
@@ -31,14 +33,19 @@ const Appointment_1 = require("../entities/Appointment");
 const Credential_1 = require("../entities/Credential");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: 'postgres',
-    url: process.env.DATABASE_URL,
-    synchronize: false, // <-- ¡Temporalmente true!
-    logging: false,
+    url: process.env.DATABASE_URL, // Usa la URL del Transaction Pooler
+    ssl: {
+        rejectUnauthorized: false, // ✅ Obligatorio para Supabase (certificado autofirmado)
+    },
+    synchronize: false, // 🚫 NUNCA en producción
+    logging: false, // Opcional: activar para depuración
     entities: [User_1.User, Appointment_1.Appointment, Credential_1.Credential],
     migrations: [],
-    // migrationsRun: true, // opcionalmente deshabilitado por ahora
+    extra: {
+        prepare: false // 🛑 Clave para el Transaction Pooler
+    }
 });
-// repositorios (igual que antes)
+// Repositorios (no modificar)
 exports.UserModel = exports.AppDataSource.getRepository(User_1.User);
 exports.AppointmentModel = exports.AppDataSource.getRepository(Appointment_1.Appointment);
 exports.CredentialModel = exports.AppDataSource.getRepository(Credential_1.Credential);

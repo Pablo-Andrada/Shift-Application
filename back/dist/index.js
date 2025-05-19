@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // IMPORTANTE: Importamos el módulo de cron jobs para que, al iniciar el servidor, 
 // se cargue y se programen las tareas automáticas (como el envío de recordatorios de turnos)
 // Esto es esencial para la automatización sin necesidad de modificar las rutas o controladores existentes.
-require("../utils/cronJobs");
+require("./utils/cronJobs");
 // Importamos el servidor configurado
 const server_1 = __importDefault(require("./server"));
 // Importamos el puerto definido en las variables de entorno
