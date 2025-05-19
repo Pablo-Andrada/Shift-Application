@@ -34,14 +34,15 @@ export const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { 
-    rejectUnauthorized: false // ✅ Necesario para Supabase
+    rejectUnauthorized: false, // ✅ Ignora certificados no válidos
+    ca: '', // Fuerza a Node.js a no validar la cadena de certificados
   } : false,
   synchronize: false,
   logging: false,
   entities: [User, Appointment, Credential],
   migrations: [],
-  extra: { // 👇 ¡Nuevo! Clave para el Transaction Pooler
-    prepare: false // Desactiva prepared statements
+  extra: {
+    prepare: false // 🛑 ¡Mantén esto desactivado!
   }
 });
 
