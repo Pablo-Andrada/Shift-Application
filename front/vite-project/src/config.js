@@ -1,0 +1,1 @@
+export const API_URL = "https://shift-backend-rvqt.onrender.com";
