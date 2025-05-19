@@ -3,7 +3,7 @@
 // IMPORTANTE: Importamos el módulo de cron jobs para que, al iniciar el servidor, 
 // se cargue y se programen las tareas automáticas (como el envío de recordatorios de turnos)
 // Esto es esencial para la automatización sin necesidad de modificar las rutas o controladores existentes.
-import "../utils/cronJobs";
+import "./utils/cronJobs";
 
 // Importamos el servidor configurado
 import server from "./server";
