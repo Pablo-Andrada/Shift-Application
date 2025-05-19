@@ -9,8 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAppointmentController = exports.createAppointmentController = exports.getAppointmentIdController = exports.getAppointmentsController = void 0;
+exports.deleteAppointmentController = exports.getAppointmentsByUserController = exports.updateAppointmentController = exports.createAppointmentController = exports.getAppointmentIdController = exports.getAppointmentsController = void 0;
 const appointmentService_1 = require("../services/appointmentService");
+const appointmentService_2 = require("../services/appointmentService");
+// Importamos la función para enviar correos de confirmación y de cancelación
+const emailService_1 = require("../services/emailService");
 /**
  * GET /appointments
  * Obtener el listado de todos los turnos de todos los usuarios.
@@ -34,7 +37,7 @@ exports.getAppointmentsController = getAppointmentsController;
  */
 const getAppointmentIdController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Aquí se asume que el ID llega como parámetro de ruta: /appointments/123
+        // Se asume que el ID llega como parámetro de ruta, ej: /appointments/123
         const { id } = req.params;
         const appointment = yield (0, appointmentService_1.getAppointmentByIdService)(Number(id));
         if (!appointment) {
@@ -53,16 +56,41 @@ exports.getAppointmentIdController = getAppointmentIdController;
 /**
  * POST /appointments/schedule
  * Agendar un nuevo turno.
+ *
+ * Se encarga de:
+ * 1. Crear el turno en la base de datos.
+ * 2. Si la creación es exitosa, enviar un correo de confirmación al usuario.
  */
 const createAppointmentController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { date, time, userId } = req.body;
-        // Convertimos `date` a un objeto Date, y `userId` a number
-        const newAppointment = yield (0, appointmentService_1.createAppointmentService)(new Date(date), time, Number(userId));
+        const { date, time, userId, comentarios } = req.body;
+        // Convertimos `date` a un objeto Date y `userId` a number
+        const newAppointment = yield (0, appointmentService_1.createAppointmentService)(new Date(date), time, Number(userId), comentarios);
         if (!newAppointment) {
-            return res
-                .status(400)
-                .json({ message: "No se pudo crear el turno (usuario inexistente)" });
+            return res.status(400).json({ message: "No se pudo crear el turno (usuario inexistente)" });
+        }
+        // Enviar el correo de confirmación sólo si la relación con el usuario está definida
+        if (newAppointment.user) {
+            // Construimos el objeto de datos para el correo de confirmación
+            const appointmentData = {
+                appointmentId: newAppointment.id,
+                date: newAppointment.date.toISOString(), // Convertimos a ISO para estandarizar la fecha
+                time: newAppointment.time,
+                userName: newAppointment.user.name,
+                userEmail: newAppointment.user.email,
+                comentarios: newAppointment.comentarios || ""
+            };
+            try {
+                yield (0, emailService_1.sendAppointmentConfirmationEmail)(appointmentData);
+                console.log("✅ Correo de confirmación enviado a:", newAppointment.user.email);
+            }
+            catch (emailError) {
+                console.error("❌ Error al enviar el correo de confirmación:", emailError.message || emailError);
+                // Decisión: continuar sin fallar la petición
+            }
+        }
+        else {
+            console.warn("⚠️ El turno creado no tiene usuario asociado para enviar el correo de confirmación.");
         }
         res.status(201).json(newAppointment);
     }
@@ -76,14 +104,41 @@ const createAppointmentController = (req, res) => __awaiter(void 0, void 0, void
 exports.createAppointmentController = createAppointmentController;
 /**
  * PUT /appointments/cancel/:id
- * Cambiar el estatus de un turno a “cancelled”.
+ * Cambiar el estatus de un turno a “cancelled” y enviar un correo de confirmación de cancelación.
  */
 const updateAppointmentController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id } = req.params; // Podrías también recibirlo por URL: /appointments/:id
+        const { id } = req.params; // Se recibe el ID del turno en la URL
+        // Obtenemos primero el turno para tener sus datos
+        const appointment = yield (0, appointmentService_1.getAppointmentByIdService)(Number(id));
+        if (!appointment) {
+            return res.status(404).json({ message: "No se encontró el turno a cancelar" });
+        }
+        // Cancelamos el turno
         const success = yield (0, appointmentService_1.cancelAppointmentService)(Number(id));
         if (!success) {
             return res.status(404).json({ message: "No se encontró el turno a cancelar" });
+        }
+        // Enviar el correo de cancelación solo si el usuario está asociado al turno
+        if (appointment.user) {
+            const cancellationData = {
+                appointmentId: appointment.id,
+                date: appointment.date.toISOString(),
+                time: appointment.time,
+                userName: appointment.user.name,
+                userEmail: appointment.user.email,
+            };
+            try {
+                yield (0, emailService_1.sendAppointmentCancellationEmail)(cancellationData);
+                console.log("✅ Correo de cancelación enviado a:", appointment.user.email);
+            }
+            catch (emailError) {
+                console.error("❌ Error al enviar el correo de cancelación:", emailError.message || emailError);
+                // Continuamos sin fallar la petición
+            }
+        }
+        else {
+            console.warn("⚠️ El turno cancelado no tiene usuario asociado para enviar el correo de cancelación.");
         }
         res.status(200).json({ message: "Turno cancelado exitosamente" });
     }
@@ -95,20 +150,44 @@ const updateAppointmentController = (req, res) => __awaiter(void 0, void 0, void
     }
 });
 exports.updateAppointmentController = updateAppointmentController;
-// import { Request, Response } from "express";
-// //GET /appointments => Obtener el listado de todos los turnos de todos los usuarios.
-// export const getAppointments = async (req:Request,res:Response) => {
-//     res.status(200).json({message:"Obtener el listado de todos los turnos de todos los usuarios"})
-// }
-// //GET /appointments => Obtener el detalle de un turno específico.
-// export const getAppointmentId = async (req: Request, res: Response) => {
-//     res.status(200).json({message:"Obtener el detalle de un turno específico"})
-// }
-// //POST /appointments/schedule => Agendar un nuevo turno.
-// export const createAppointment = async (req:Request,res:Response) => {
-//     res.status(200).json({message:"Agendar un nuevo turno"})
-// }
-// //PUT /appointments/cancel => Cambiar el estatus de un turno a “cancelled”.
-// export const updateAppointment = async (req:Request,res:Response) => {
-//     res.status(200).json({message:"Cambiar el estatus de un turno a “cancelled”"});
-// }
+/**
+ * GET /appointments/user/:userId
+ * Obtener todos los turnos de un usuario específico.
+ */
+const getAppointmentsByUserController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        // Este servicio trae todos los turnos del usuario cuyo ID es userId
+        const appointments = yield (0, appointmentService_2.getAppointmentsByUserIdService)(Number(userId));
+        res.status(200).json(appointments);
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Error al obtener los turnos del usuario",
+            error,
+        });
+    }
+});
+exports.getAppointmentsByUserController = getAppointmentsByUserController;
+/**
+ * DELETE /appointments/:id
+ * Elimina un turno de la base de datos.
+ */
+const deleteAppointmentController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        // Llamamos al service para eliminar el turno
+        const success = yield (0, appointmentService_1.deleteAppointmentService)(Number(id));
+        if (!success) {
+            return res.status(404).json({ message: "Turno no encontrado para eliminar" });
+        }
+        res.status(200).json({ message: "Turno eliminado exitosamente" });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Error al eliminar el turno",
+            error,
+        });
+    }
+});
+exports.deleteAppointmentController = deleteAppointmentController;
