@@ -33,15 +33,14 @@ import { Credential } from '../entities/Credential';
 export const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
-  synchronize: false,     // <-- ¡Temporalmente true!
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false, // ✅ Seguro en producción
+  synchronize: false,
   logging: false,
   entities: [User, Appointment, Credential],
   migrations: [],
-  // migrationsRun: true, // opcionalmente deshabilitado por ahora
 });
 
-
-// repositorios (igual que antes)
+// Repositorios (sin cambios)
 export const UserModel = AppDataSource.getRepository(User);
 export const AppointmentModel = AppDataSource.getRepository(Appointment);
 export const CredentialModel = AppDataSource.getRepository(Credential);
