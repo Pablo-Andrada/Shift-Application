@@ -14,6 +14,7 @@ import { PORT } from "./config/envs";
 // Importamos la conexión de la base de datos (DataSource) para inicializarla
 import { AppDataSource } from "./config/data-source";
 
+console.log('USING DATABASE_URL =', process.env.DATABASE_URL);
 // Inicializamos la conexión a la base de datos
 AppDataSource.initialize()
   .then(() => {
