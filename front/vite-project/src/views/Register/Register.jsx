@@ -76,7 +76,7 @@ const Register = ({ onClose }) => {
 
     try {
       // Realizamos la petición POST al endpoint de registro del backend.
-      const response = await fetch("http://localhost:3000/user/register", {
+      const response = await fetch("https://shift-backend-rvqt.onrender.com/user/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Convertimos la fecha al formato ISO (por ejemplo, "1988-07-15T00:00:00.000Z")
