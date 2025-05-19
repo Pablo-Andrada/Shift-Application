@@ -33,11 +33,16 @@ import { Credential } from '../entities/Credential';
 export const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false, // ✅ Seguro en producción
+  ssl: process.env.NODE_ENV === 'production' ? { 
+    rejectUnauthorized: false // ✅ Necesario para Supabase
+  } : false,
   synchronize: false,
   logging: false,
   entities: [User, Appointment, Credential],
   migrations: [],
+  extra: { // 👇 ¡Nuevo! Clave para el Transaction Pooler
+    prepare: false // Desactiva prepared statements
+  }
 });
 
 // Repositorios (sin cambios)
