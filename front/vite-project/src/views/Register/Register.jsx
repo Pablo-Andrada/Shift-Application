@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"; // Hook para redireccionar
 import useUserContext from "../../hooks/useUserContext"; // Hook del contexto de usuario
 import styles from "./Register.module.css";
 
+const API = import.meta.env.VITE_API_URL;
 /**
  * Componente Register
  * Muestra un formulario controlado para el registro de un nuevo usuario.
@@ -76,7 +77,7 @@ const Register = ({ onClose }) => {
 
     try {
       // Realizamos la petición POST al endpoint de registro del backend.
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/user/register`, {
+      const response = await fetch(`${API}/user/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Convertimos la fecha al formato ISO (por ejemplo, "1988-07-15T00:00:00.000Z")

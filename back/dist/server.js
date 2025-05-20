@@ -9,10 +9,18 @@ const cors_1 = __importDefault(require("cors")); // Importamos el middleware COR
 const indexRouter_1 = __importDefault(require("./routes/indexRouter"));
 const morgan_1 = __importDefault(require("morgan"));
 const server = (0, express_1.default)();
+const allowedOrigins = [
+    "https://shift-application-1iwg.vercel.app", // Reemplaza con tu dominio en Vercel
+    "http://localhost:5173", // Para desarrollo local
+];
 // Configuramos CORS para permitir solicitudes desde otros orígenes.
 // Con la configuración por defecto, se permiten todas las solicitudes, lo cual es adecuado en desarrollo.
 // Si necesitás restringir los orígenes, podés pasar opciones (por ejemplo: { origin: "http://localhost:5173" }).
-server.use((0, cors_1.default)());
+server.use((0, cors_1.default)({
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+}));
 // Middleware para registrar las solicitudes en consola (útil en desarrollo)
 server.use((0, morgan_1.default)("dev"));
 // Middleware para parsear solicitudes JSON

@@ -10,6 +10,8 @@ import Modal from "../../components/Modal/Modal";
 import Login from "../Login/Login";
 import Register from "../Register/Register";
 
+const API = import.meta.env.VITE_API_URL;
+
 /**
  * Función que ajusta la fecha recibida (en formato ISO) sumándole el desfase de la zona horaria.
  * Esto permite que la fecha se muestre correctamente en la hora local del navegador.
@@ -77,7 +79,7 @@ function Home() {
 
     try {
       // 1) Pedimos los turnos del usuario al backend
-      const response = await fetch(`http://localhost:3000/appointments/user/${user.id}`);
+      const response = await fetch(`${API}/appointments/user/${user.id}`);
       if (!response.ok) {
         throw new Error("No se pudieron obtener los turnos.");
       }

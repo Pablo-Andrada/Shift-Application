@@ -145,6 +145,8 @@ import React, { useState } from "react";
 import styles from "./CreateAppointment.module.css";
 import useUserContext from "../../hooks/useUserContext";
 
+const API = import.meta.env.VITE_API_URL;
+
 /**
  * Componente CreateAppointment
  * Muestra un formulario en un modal para que el usuario logueado cree un nuevo turno.
@@ -220,7 +222,7 @@ const CreateAppointment = ({ onClose, onSuccess }) => {
       };
 
       // Realizamos la petición POST al endpoint de creación de turnos
-      const response = await fetch("http://localhost:3000/appointments/schedule", {
+      const response = await fetch(`${API}/appointments/schedule`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
