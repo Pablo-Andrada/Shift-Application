@@ -56,7 +56,7 @@ const Login = ({ onClose }) => {
     
     try {
       console.log("Enviando solicitud de login al backend...");
-      const response = await fetch(`${API}}/user/login`, {
+      const response = await fetch(`${API}/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
