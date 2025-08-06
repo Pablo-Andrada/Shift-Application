@@ -19,7 +19,7 @@ Shift Application is a full-stack scheduling platform for managing appointments 
 
 - **User Authentication**: Register and log in with email and password. Passwords are securely hashed.
 - **Appointment Scheduling**: Users can schedule new appointments by selecting date, time, and adding optional comments.
-- **Appointment Listing**: View all your appointments, filter by status (active, cancelled).
+- **Appointment Listing**: View all your appointments, filter by status (active, cancelled ).
 - **Appointment Cancellation**: Cancel an existing appointment; status is updated and email notification sent.
 - **Appointment Deletion**: Permanently delete appointments via a delete (✖) button in the UI.
 - **Responsive UI**: Built with React and CSS Modules for a clean, responsive interface.
