@@ -1,4 +1,4 @@
-# docker-compose.yml (reemplazar completo, sin atributo 'version')
+# docker-compose.yml (REEMPLAZAR COMPLETO)
 services:
   db:
     image: postgres:15
@@ -31,10 +31,8 @@ services:
       - ./back/.env.docker
     ports:
       - "3001:3000"
-    volumes:
-      - ./back:/app
-      - /app/node_modules
-    # NO command aquí: dejamos que el Dockerfile use CMD por defecto
+    # IMPORTANT: NO host bind-mount of ./back here. Usamos la imagen construida.
+    # volumes: removed for production image to avoid hiding /app contents
 
 volumes:
   db_data:
