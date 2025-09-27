@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   db:
     image: postgres:15
@@ -21,15 +22,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # aquí se leen las variables del contenedor
       DATABASE_URL: postgres://shift_user:shift_pass@db:5432/shift_db
       NODE_ENV: development
       PORT: 3000
-      # Si seguís usando Supabase podés poner las variables; si no, borralas.
-      SUPABASE_URL: ${SUPABASE_URL}
-      SUPABASE_KEY: ${SUPABASE_KEY}
-    # para desarrollo podés montar código (opcional)
-    volumes:
-      - ./:/app
+    restart: unless-stopped
+
 volumes:
   db-data:
