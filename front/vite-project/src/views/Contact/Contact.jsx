@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 // Importamos el ícono de WhatsApp de react-icons (asegúrate de tener instalado react-icons)
 import { FaWhatsapp } from "react-icons/fa";
 
+const API = import.meta.env.VITE_API_URL;
+
 const Contacto = () => {
   // Estado para manejar los datos del formulario
   const [formData, setFormData] = useState({
@@ -26,7 +28,7 @@ const Contacto = () => {
 
     try {
       // Realiza la petición POST al backend, ajusta la URL si es necesario
-      const response = await fetch("http://localhost:3000/contact", {
+      const response = await fetch(`${API}/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

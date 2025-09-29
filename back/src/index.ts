@@ -3,7 +3,7 @@
 // IMPORTANTE: Importamos el módulo de cron jobs para que, al iniciar el servidor, 
 // se cargue y se programen las tareas automáticas (como el envío de recordatorios de turnos)
 // Esto es esencial para la automatización sin necesidad de modificar las rutas o controladores existentes.
-import "../src/utils/cronJobs";
+import "./utils/cronJobs";
 
 // Importamos el servidor configurado
 import server from "./server";
@@ -14,6 +14,7 @@ import { PORT } from "./config/envs";
 // Importamos la conexión de la base de datos (DataSource) para inicializarla
 import { AppDataSource } from "./config/data-source";
 
+console.log('USING DATABASE_URL =', process.env.DATABASE_URL);
 // Inicializamos la conexión a la base de datos
 AppDataSource.initialize()
   .then(() => {

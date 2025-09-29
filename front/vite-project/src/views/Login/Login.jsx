@@ -4,6 +4,7 @@ import styles from "./Login.module.css";
 import useUserContext from "../../hooks/useUserContext";
 import { useNavigate } from "react-router-dom";
 
+const API = import.meta.env.VITE_API_URL;
 /**
  * Componente Login
  * Muestra un formulario de inicio de sesión.
@@ -55,7 +56,7 @@ const Login = ({ onClose }) => {
     
     try {
       console.log("Enviando solicitud de login al backend...");
-      const response = await fetch("http://localhost:3000/user/login", {
+      const response = await fetch(`${API}/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })

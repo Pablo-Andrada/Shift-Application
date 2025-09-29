@@ -7,13 +7,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // IMPORTANTE: Importamos el módulo de cron jobs para que, al iniciar el servidor, 
 // se cargue y se programen las tareas automáticas (como el envío de recordatorios de turnos)
 // Esto es esencial para la automatización sin necesidad de modificar las rutas o controladores existentes.
-require("../src/utils/cronJobs");
+require("./utils/cronJobs");
 // Importamos el servidor configurado
 const server_1 = __importDefault(require("./server"));
 // Importamos el puerto definido en las variables de entorno
 const envs_1 = require("./config/envs");
 // Importamos la conexión de la base de datos (DataSource) para inicializarla
 const data_source_1 = require("./config/data-source");
+console.log('USING DATABASE_URL =', process.env.DATABASE_URL);
 // Inicializamos la conexión a la base de datos
 data_source_1.AppDataSource.initialize()
     .then(() => {

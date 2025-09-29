@@ -1,16 +1,4 @@
 "use strict";
-// // src/controllers/usersController.ts
-// import { Request, Response } from "express";
-// import {
-//   createUserService,
-//   getUsersService,
-//   getUserByIdService,
-//   deleteUserService,
-//   getUserByCredentialIdService
-// } from "../services/userService";
-// import { createCredential } from "../services/credentialService"; // para registro
-// import { CredentialModel } from "../config/data-source";           // para login directo
-// import { User } from "../entities/User";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -27,44 +15,21 @@ const credentialService_1 = require("../services/credentialService"); // para re
 const data_source_1 = require("../config/data-source"); // para login directo
 /**
  * POST /user/register => Registro de un nuevo usuario.
- * Recibe del body: name, email, birthdate, nDni (o dni) y password.
+ * Recibe del body: name, email, birthdate, nDni y password.
  * Primero crea las credenciales usando el email y luego crea el usuario.
  */
 const createUserController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
-    // Aceptar tanto nDni como dni (por si el front manda uno u otro)
-    const { name, email, birthdate, nDni, dni, password } = req.body;
-    // Unificamos a una sola variable que vamos a pasar al service/entidad
-    const nDniValue = (_a = nDni !== null && nDni !== void 0 ? nDni : dni) !== null && _a !== void 0 ? _a : null;
-    // LOG mínimo para ver qué llega (sin mostrar password en claro)
-    console.log('POST /user/register - body:', { name, email, birthdate, nDni: nDniValue });
+    const { name, email, birthdate, nDni, password } = req.body;
     if (!password) {
         return res.status(400).json({ message: "El campo 'password' es obligatorio." });
     }
     try {
-        // Creamos las credenciales y obtenemos el id
         const credentialId = yield (0, credentialService_1.createCredential)(email, password);
-        // Llamamos al service pasando nDni unificado
-        const newUser = yield (0, userService_1.createUserService)({
-            name,
-            email,
-            birthdate,
-            nDni: nDniValue,
-            credentialsId: credentialId
-        });
+        const newUser = yield (0, userService_1.createUserService)({ name, email, birthdate, nDni, credentialsId: credentialId });
         res.status(201).json(newUser);
     }
     catch (error) {
-        // Log detallado (útil para ver el detalle de Postgres/TypeORM sin romper respuesta al front)
-        const err = error;
-        console.error('ERROR Registro:', {
-            message: err === null || err === void 0 ? void 0 : err.message,
-            code: err === null || err === void 0 ? void 0 : err.code,
-            detail: ((_b = err === null || err === void 0 ? void 0 : err.driverError) === null || _b === void 0 ? void 0 : _b.detail) || (err === null || err === void 0 ? void 0 : err.detail),
-            query: err === null || err === void 0 ? void 0 : err.query,
-            parameters: err === null || err === void 0 ? void 0 : err.parameters
-        });
-        return res.status(400).json({ message: "Error al crear el usuario", reason: ((_c = err === null || err === void 0 ? void 0 : err.driverError) === null || _c === void 0 ? void 0 : _c.detail) || (err === null || err === void 0 ? void 0 : err.message) });
+        res.status(400).json({ message: "Error al crear el usuario", error });
     }
 });
 exports.createUserController = createUserController;

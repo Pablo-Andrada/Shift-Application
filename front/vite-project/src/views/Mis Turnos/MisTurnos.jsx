@@ -9,6 +9,8 @@ import AppointmentCard from "../../components/AppointmentCard/AppointmentCard";
 // Importamos la función toast de react-toastify para mostrar notificaciones en vez del popup nativo
 import { toast } from "react-toastify";
 
+const API = import.meta.env.VITE_API_URL;
+
 /**
  * Componente MisTurnos
  * Muestra los turnos asociados al usuario logueado.
@@ -44,7 +46,7 @@ const MisTurnos = () => {
 
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/appointments/user/${user.id}`);
+        const response = await fetch(`${API}/appointments/user/${user.id}`);
         if (!response.ok) {
           throw new Error("No se pudieron obtener los turnos.");
         }
@@ -91,7 +93,7 @@ const MisTurnos = () => {
    */
   const handleCancel = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3000/appointments/cancel/${id}`, {
+      const response = await fetch(`${API}/appointments/cancel/${id}`, {
         method: "PUT",
       });
       if (!response.ok) {
@@ -121,7 +123,7 @@ const MisTurnos = () => {
   const handleDismiss = async (id) => {
     try {
       // Realizamos la petición DELETE para eliminar el turno en el backend
-      const response = await fetch(`http://localhost:3000/appointments/${id}`, {
+      const response = await fetch(`${API}/appointments/${id}`, {
         method: "DELETE",
       });
       if (!response.ok) {
@@ -146,7 +148,7 @@ const MisTurnos = () => {
   const handleCreateAppointment = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/appointments/schedule", {
+      const response = await fetch(`${API}/appointments/schedule`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
