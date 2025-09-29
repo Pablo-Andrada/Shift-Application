@@ -1,18 +1,16 @@
-# Stage 1: build the typescript app
-FROM node:18-alpine AS builder
+# back/Dockerfile - optimizado para producción
+FROM node:18-alpine AS base
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --only=production
+
 COPY . .
+
+# Compilar TypeScript
 RUN npm run build
 
-# Stage 2: runtime
-FROM node:18-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/src ./src
 EXPOSE 3000
+
+# Usar la build JS generada (asumo que build pone JS en /dist)
 CMD ["node", "dist/index.js"]

@@ -1,0 +1,44 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: shift-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: shift_aplication
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+      start_period: 5s
+
+  back:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: shift-back
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ./back/.env.docker
+    ports:
+      # Mapeo por defecto a 3000; si querés correr backend local y dockerizado a la vez,
+      # cambiá el puerto host a 3001 (ver instrucciones abajo)
+      - "3001:3000"
+    volumes:
+      - ./back:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run start:prod" # en dev usá Dockerfile.dev / dev scripts
+
+volumes:
+  db_data:
