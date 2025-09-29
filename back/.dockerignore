@@ -1,6 +1,11 @@
 node_modules
 dist
-npm-debug.log
-.DS_Store
-.vscode
 .env
+.env.local
+.env.docker
+npm-debug.log
+Dockerfile*
+docker-compose.override.yml
+.vscode
+.idea
+*.tsbuildinfo

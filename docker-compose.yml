@@ -1,6 +1,4 @@
-# docker-compose.yml
-version: '3.8'
-
+# docker-compose.yml (reemplazar completo, sin atributo 'version')
 services:
   db:
     image: postgres:15
@@ -32,13 +30,11 @@ services:
     env_file:
       - ./back/.env.docker
     ports:
-      # Mapeo por defecto a 3000; si querés correr backend local y dockerizado a la vez,
-      # cambiá el puerto host a 3001 (ver instrucciones abajo)
       - "3001:3000"
     volumes:
       - ./back:/app
       - /app/node_modules
-    command: sh -c "npm install && npm run start:prod" # en dev usá Dockerfile.dev / dev scripts
+    # NO command aquí: dejamos que el Dockerfile use CMD por defecto
 
 volumes:
   db_data:
