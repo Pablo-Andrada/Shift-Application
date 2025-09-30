@@ -12,7 +12,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
     username: "postgres",
     password: "admin",
     database: "shift_aplication",
-    dropSchema: true, //esta linea sirve para reiniciar la base de datos, es decir los usuarios y vehicles
+    //dropSchema: true,   //esta linea sirve para reiniciar la base de datos, es decir los usuarios y vehicles
     synchronize: true,
     logging: false,
     entities: [User_1.User, Appointment_1.Appointment, Credential_1.Credential],
