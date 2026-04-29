@@ -12,7 +12,7 @@ const allowedOrigins = [
 ];
 // Configuramos CORS para permitir solicitudes desde otros orígenes.
 // Con la configuración por defecto, se permiten todas las solicitudes, lo cual es adecuado en desarrollo.
-// Si necesitás restringir los orígenes, podés pasar opciones (por ejemplo: { origin: "http://localhost:5173" }).
+// Si se necesita restringir los orígenes, podria pasar opciones (por ejemplo: { origin: "http://localhost:5173" }).
 server.use(cors({
   origin: allowedOrigins,
   methods: ["GET", "POST", "PUT", "DELETE"],
