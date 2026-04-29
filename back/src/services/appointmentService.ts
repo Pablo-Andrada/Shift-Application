@@ -1,136 +1,110 @@
-// src/services/appointmentService.ts
-import { AppointmentModel, UserModel } from "../config/data-source";
+import { AppointmentModel, UserModel, AppDataSource } from "../config/data-source";
 import { Appointment } from "../entities/Appointment";
-import { AppDataSource } from "../config/data-source";
+import { AppointmentDto } from "../dtos/AppointmentDto";
 
-/**
- * Obtiene todos los turnos (appointments) de la base de datos.
- * Se incluyen las relaciones con el usuario (user) para obtener información completa.
- */
 export async function getAllAppointmentsService(): Promise<Appointment[]> {
-  return await AppointmentModel.find({
-    relations: ["user"]
-  });
+    return await AppointmentModel.find({ relations: ["user"] });
 }
 
-/**
- * Obtiene un turno específico por su ID.
- * @param id - El ID del turno.
- */
 export async function getAppointmentByIdService(id: number): Promise<Appointment | null> {
-  return await AppointmentModel.findOne({
-    where: { id },
-    relations: ["user"]
-  });
+    return await AppointmentModel.findOne({ where: { id }, relations: ["user"] });
 }
 
-/**
- * Crea un nuevo turno (appointment) en la base de datos.
- * Se verifica que el usuario exista antes de crearlo, ya que no puede haber un turno sin un usuario.
- * Además, se incluye el nuevo campo 'comentarios' para almacenar comentarios adicionales (máximo 50 caracteres).
- *
- * @param date - La fecha del turno.
- * @param time - La hora del turno.
- * @param userId - El ID del usuario que solicita el turno.
- * @param comentarios - (Opcional) Texto con comentarios adicionales. Si se proporciona, se recorta a 50 caracteres.
- * @returns Un turno creado o null en caso de error (por ejemplo, si el usuario no existe).
- */
-export async function createAppointmentService(
-  date: Date,
-  time: string,
-  userId: number,
-  comentarios?: string
-): Promise<Appointment | null> {
-  // Verificamos que el usuario exista usando el repositorio de usuarios
-  const user = await UserModel.findOneBy({ id: userId });
-  if (!user) {
-    console.error('No se puede crear un turno sin un usuario válido.');
-    return null;
-  }
+export async function createAppointmentService(dto: AppointmentDto): Promise<Appointment | null> {
+    const user = await UserModel.findOneBy({ id: dto.userId });
+    if (!user) return null;
 
-  // Creamos la instancia del turno
-  // Se incluye el campo 'comentarios'; se utiliza substring para asegurarse de no exceder 50 caracteres.
-  const newAppointment = AppointmentModel.create({
-    date,
-    time,
-    userId,            // Guardamos el ID del usuario
-    status: "active",  // Estado inicial del turno
-    comentarios: comentarios ? comentarios.substring(0, 50) : ""
-  });
+    const newAppointment = AppointmentModel.create({
+        date: dto.date,
+        time: dto.time,
+        userId: dto.userId,
+        status: "active",
+        descripcionFalla: dto.descripcionFalla?.substring(0, 200) || "",
+        vehicleBrand: dto.vehicleBrand?.substring(0, 100) || "",
+        vehicleModel: dto.vehicleModel?.substring(0, 100) || "",
+        vehiclePlate: dto.vehiclePlate?.substring(0, 20) || "",
+        vehicleYear: dto.vehicleYear?.substring(0, 4) || "",
+        repairType: dto.repairType?.substring(0, 100) || "",
+        adminNotes: dto.adminNotes?.substring(0, 200) || "",
+        adminMessage: dto.adminMessage?.substring(0, 300) || "",
+        estimatedDuration: dto.estimatedDuration || 0,
+        comentarios: dto.comentarios?.substring(0, 50) || "",
+    });
 
-  // Asignamos la relación con el usuario (opcional, pero recomendable para tener acceso al objeto completo)
-  newAppointment.user = user;
-
-  // Guardamos el turno en la base de datos
-  await AppointmentModel.save(newAppointment);
-  return newAppointment;
+    newAppointment.user = user;
+    await AppointmentModel.save(newAppointment);
+    return newAppointment;
 }
 
-/**
- * Cancela un turno cambiando su estado a "cancelled".
- *
- * @param id - El ID del turno a cancelar.
- * @returns true si se cancela el turno exitosamente; false si el turno no existe.
- */
 export async function cancelAppointmentService(id: number): Promise<boolean> {
-  // Buscamos el turno en la base de datos
-  const appointment = await AppointmentModel.findOneBy({ id });
-  if (!appointment) {
-    console.error('El turno con el ID especificado no existe.');
-    return false;
-  }
-
-  // Actualizamos el estado del turno
-  appointment.status = 'cancelled';
-  await AppointmentModel.save(appointment);
-  return true;
+    const appointment = await AppointmentModel.findOneBy({ id });
+    if (!appointment) return false;
+    appointment.status = "cancelled";
+    await AppointmentModel.save(appointment);
+    return true;
 }
 
-/**
- * Obtiene todos los turnos de un usuario específico, usando su ID.
- * Se incluyen también los datos del usuario (relación con la entidad User).
- *
- * @param userId - El ID del usuario.
- * @returns Un arreglo con todos los turnos pertenecientes a ese usuario.
- */
 export async function getAppointmentsByUserIdService(userId: number): Promise<Appointment[]> {
-  return await AppointmentModel.find({
-    where: {
-      user: {
-        id: userId, // Filtramos los turnos cuyo usuario tenga este ID
-      },
-    },
-    relations: ["user"], // Incluimos también los datos del usuario (join)
-  });
+    return await AppointmentModel.find({
+        where: { user: { id: userId } },
+        relations: ["user"],
+        order: { date: "ASC" }
+    });
 }
 
-/**
- * updateAppointmentReminderSent:
- * Actualiza el turno para marcar que ya se envió el recordatorio.
- *
- * @param appointmentId - El ID del turno al cual se le actualiza la bandera de recordatorio enviado.
- */
+export async function updateAppointmentAdminService(
+    id: number,
+    updates: Partial<Pick<Appointment, "date" | "time" | "adminNotes" | "adminMessage" | "estimatedDuration" | "repairType">>
+): Promise<Appointment | null> {
+    const appointment = await AppointmentModel.findOne({ where: { id }, relations: ["user"] });
+    if (!appointment) return null;
+    Object.assign(appointment, updates);
+    await AppointmentModel.save(appointment);
+    return appointment;
+}
+
 export const updateAppointmentReminderSent = async (appointmentId: number): Promise<void> => {
-  const appointmentRepo = AppDataSource.getRepository(Appointment);
-  await appointmentRepo.update(appointmentId, { reminderSent: true });
+    const repo = AppDataSource.getRepository(Appointment);
+    await repo.update(appointmentId, { reminderSent: true });
 };
 
-/**
- * DELETE Appointment:
- * Elimina un turno de la base de datos.
- *
- * @param id - El ID del turno a eliminar.
- * @returns true si se elimina el turno exitosamente; false si no existe.
- */
 export async function deleteAppointmentService(id: number): Promise<boolean> {
-  // Buscamos el turno por su ID
-  const appointment = await AppointmentModel.findOneBy({ id });
-  if (!appointment) {
-    console.error("El turno con el ID especificado no existe.");
-    return false;
-  }
+    const appointment = await AppointmentModel.findOneBy({ id });
+    if (!appointment) return false;
+    await AppointmentModel.delete(id);
+    return true;
+}
 
-  // Eliminamos el turno
-  await AppointmentModel.delete(id);
-  return true;
+// Horarios disponibles del taller (los gestiona el admin)
+export async function getAvailableSlotsService(dateStr: string): Promise<string[]> {
+    // Todos los slots posibles del taller: lunes a sábado 8-18hs cada 30min
+    const allSlots = generateSlots("08:00", "18:00", 30);
+
+    // Turnos ya ocupados ese día
+    const startOfDay = new Date(dateStr + "T00:00:00.000Z");
+    const endOfDay = new Date(dateStr + "T23:59:59.999Z");
+
+    const taken = await AppointmentModel.createQueryBuilder("a")
+        .where("a.date >= :start AND a.date <= :end", { start: startOfDay, end: endOfDay })
+        .andWhere("a.status = :status", { status: "active" })
+        .select(["a.time"])
+        .getMany();
+
+    const takenTimes = new Set(taken.map(a => a.time));
+    return allSlots.filter(slot => !takenTimes.has(slot));
+}
+
+function generateSlots(from: string, to: string, intervalMinutes: number): string[] {
+    const slots: string[] = [];
+    const [fh, fm] = from.split(":").map(Number);
+    const [th, tm] = to.split(":").map(Number);
+    let current = fh * 60 + fm;
+    const end = th * 60 + tm;
+    while (current < end) {
+        const h = Math.floor(current / 60).toString().padStart(2, "0");
+        const m = (current % 60).toString().padStart(2, "0");
+        slots.push(`${h}:${m}`);
+        current += intervalMinutes;
+    }
+    return slots;
 }

@@ -86,3 +86,24 @@
   background-color: #ccc;
   cursor: not-allowed;
 }
+
+.adminToggle {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0.25rem 0;
+    text-decoration: underline;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.adminCodeInput {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px dashed #94a3b8;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: #f8fafc;
+}

@@ -1,110 +1,157 @@
-/* src/components/CreateAppointment/CreateAppointment.module.css */
-
-/* Overlay que cubre toda la pantalla para el modal */
 .modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
 }
 
-/* Contenedor del modal */
 .modalContent {
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 10px;
-  max-width: 350px; /* Ancho máximo reducido */
-  width: 90%;       /* Ancho flexible para dispositivos pequeños */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 
-/* Estilo para el título del modal */
-.modalContent h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  text-align: center;
-  color: #333;
+.modalHeader {
+    margin-bottom: 1.5rem;
 }
 
-/* Formulario dentro del modal */
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem; /* Espacio entre los elementos */
+.modalHeader h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 0.5rem;
 }
 
-/* Grupo de cada campo del formulario */
+.stepIndicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.activeStep { color: #2563eb; font-weight: 700; }
+.doneStep { color: #16a34a; font-weight: 600; }
+.inactiveStep { color: #94a3b8; }
+.stepSep { color: #cbd5e1; }
+
+.form { display: flex; flex-direction: column; gap: 1rem; }
+
+.formRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
 .formGroup {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
 }
 
-/* Estilo para las etiquetas */
 .formGroup label {
-  font-weight: bold;
-  margin-bottom: 0.3rem;
-  color: #333;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
 }
 
-/* Estilo para los inputs */
-.formGroup input {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+    padding: 0.55rem 0.75rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 7px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    font-family: inherit;
 }
 
-/* Estilo para el mensaje de error */
-.error {
-  color: red;
-  text-align: center;
-  font-size: 0.9rem;
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+    outline: none;
+    border-color: #2563eb;
 }
 
-/* Contenedor para los botones de acción */
+.formGroup small { color: #94a3b8; font-size: 0.75rem; }
+
+.slotsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.slotBtn {
+    padding: 0.5rem 0.25rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 7px;
+    background: #f8fafc;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.slotBtn:hover { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+
+.slotSelected {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #fff !important;
+    font-weight: 700;
+}
+
+.summary {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+    color: #0369a1;
+}
+
+.summary p { margin: 0.2rem 0; }
+
+.loading, .noSlots { font-size: 0.88rem; color: #64748b; }
+
+.error { color: #dc2626; font-size: 0.88rem; }
+
 .buttonContainer {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
 }
 
-/* Botón para cancelar (estilo secundario) */
 .cancelButton {
-  background-color: #ccc;
-  color: #333;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.2s, transform 0.2s;
+    padding: 0.6rem 1.2rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    color: #374151;
+    font-size: 0.9rem;
+    cursor: pointer;
 }
 
-.cancelButton:hover {
-  background-color: #aaa;
-  transform: scale(1.03);
-}
-
-/* Botón para guardar (estilo primario) */
 .saveButton {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.2s, transform 0.2s;
+    padding: 0.6rem 1.4rem;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
-.saveButton:hover {
-  background-color: #0056b3;
-  transform: scale(1.03);
-}
+.saveButton:hover:not(:disabled) { background: #1d4ed8; }
+.saveButton:disabled { opacity: 0.5; cursor: not-allowed; }

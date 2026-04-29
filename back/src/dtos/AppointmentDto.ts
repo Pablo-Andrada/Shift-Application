@@ -1,9 +1,15 @@
-interface AppointmentDto {
-    date: Date;   
-    time: string;  
+export interface AppointmentDto {
+    date: Date;
+    time: string;
     userId: number;
-    status: "active" | "cancelled";
-    comentarios: string
-};
-
-export default AppointmentDto;
+    descripcionFalla?: string;
+    vehicleBrand?: string;
+    vehicleModel?: string;
+    vehiclePlate?: string;
+    vehicleYear?: string;
+    repairType?: string;
+    adminNotes?: string;
+    adminMessage?: string;
+    estimatedDuration?: number;
+    comentarios?: string;
+}

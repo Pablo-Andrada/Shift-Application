@@ -2,32 +2,39 @@ import { Column, Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn, OneToMany
 import { Appointment } from "./Appointment";
 import { Credential } from "./Credential";
 
-@Entity({
-    name:"users"
-})//users
+export type UserRole = "admin" | "user";
+
+@Entity({ name: "users" })
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column({ length: 100 })
     name: string;
-    
+
     @Column()
     email: string;
-    
+
     @Column()
     birthdate: Date;
-    
+
     @Column()
     nDni: string;
 
     @Column()
     credentialsId: number;
 
-    @OneToOne(() => Credential, (credential) => credential.user) 
-    @JoinColumn()
-    credential: Credential;  // Antes era solo "credentialsId", ahora se hace bien la relación 1:1
+    @Column({
+        type: "enum",
+        enum: ["admin", "user"],
+        default: "user"
+    })
+    role: UserRole;
 
-    @OneToMany(() => Appointment , (appointment) => appointment.user)
+    @OneToOne(() => Credential, (credential) => credential.user)
+    @JoinColumn()
+    credential: Credential;
+
+    @OneToMany(() => Appointment, (appointment) => appointment.user)
     appointments: Appointment[];
 }

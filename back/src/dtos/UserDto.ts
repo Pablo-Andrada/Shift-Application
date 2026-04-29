@@ -1,10 +1,10 @@
-interface UserDto {
-    name: string;   
-    email: string;   
+import { UserRole } from "../entities/User";
+
+export default interface UserDto {
+    name: string;
+    email: string;
     birthdate: Date;
     nDni: string;
     credentialsId: number;
-};
-
-export default UserDto;
-
+    role?: UserRole;
+}

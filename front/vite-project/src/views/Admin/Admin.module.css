@@ -1,0 +1,196 @@
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.title { font-size: 1.8rem; font-weight: 800; color: #1e293b; margin: 0; }
+.subtitle { color: #64748b; margin: 0.25rem 0 0; font-size: 0.95rem; }
+
+.createBtn {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.65rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+.createBtn:hover { background: #1d4ed8; }
+
+.statsRow {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.statCard {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.statNum { display: block; font-size: 2rem; font-weight: 800; color: #2563eb; }
+.statLabel { font-size: 0.8rem; color: #64748b; }
+
+.filters {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.filterGroup { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+.filterGroup label { font-weight: 600; color: #374151; }
+.filterGroup input, .filterGroup select {
+    padding: 0.45rem 0.75rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 7px;
+    font-size: 0.9rem;
+}
+
+.clearBtn {
+    background: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: #64748b;
+}
+
+.loading, .empty { text-align: center; color: #64748b; padding: 2rem; }
+
+.dateGroup { margin-bottom: 2rem; }
+
+.dateTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-transform: capitalize;
+}
+
+.dateBadge {
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+}
+
+.card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s;
+}
+.card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.cardCancelled { opacity: 0.6; border-left: 4px solid #f87171; }
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.cardLeft { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.cardTime { font-weight: 700; color: #2563eb; font-size: 1rem; }
+.cardName { font-weight: 600; color: #1e293b; }
+.cardRepair { color: #64748b; font-size: 0.85rem; }
+.cardRight { display: flex; align-items: center; gap: 0.75rem; }
+.expandIcon { color: #94a3b8; font-size: 0.75rem; }
+
+.badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+}
+.badgeActive { background: #dcfce7; color: #16a34a; }
+.badgeCancelled { background: #fee2e2; color: #dc2626; }
+
+.cardBody { padding: 1rem 1.25rem 1.25rem; border-top: 1px solid #f1f5f9; }
+
+.detail {}
+.detailCols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+.detail h4 { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.4rem; }
+.detail p { font-size: 0.9rem; color: #374151; margin: 0.2rem 0; }
+
+.cardActions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #f1f5f9; }
+
+.btnEdit, .btnCancel, .btnDelete {
+    padding: 0.45rem 1rem;
+    border-radius: 7px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s;
+}
+.btnEdit { background: #eff6ff; color: #2563eb; }
+.btnCancel { background: #fef3c7; color: #d97706; }
+.btnDelete { background: #fee2e2; color: #dc2626; }
+.btnEdit:hover, .btnCancel:hover, .btnDelete:hover { opacity: 0.8; }
+
+/* Edit form */
+.editForm h4 { font-size: 1rem; font-weight: 700; color: #1e293b; margin: 0 0 1rem; }
+.editGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+.editGroup { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.75rem; }
+.editGroup label { font-size: 0.82rem; font-weight: 600; color: #374151; }
+.editGroup input, .editGroup textarea {
+    padding: 0.5rem 0.75rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 7px;
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+.editGroup input:focus, .editGroup textarea:focus { outline: none; border-color: #2563eb; }
+
+.editActions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.5rem; }
+.btnPrimary { background: #2563eb; color: #fff; border: none; border-radius: 7px; padding: 0.5rem 1.2rem; font-weight: 600; cursor: pointer; }
+.btnPrimary:hover { background: #1d4ed8; }
+.btnSecondary { background: #f1f5f9; color: #374151; border: 1px solid #e2e8f0; border-radius: 7px; padding: 0.5rem 1rem; cursor: pointer; }
+
+@media (max-width: 600px) {
+    .statsRow { grid-template-columns: 1fr 1fr; }
+    .detailCols { grid-template-columns: 1fr; }
+    .editGrid { grid-template-columns: 1fr; }
+}

@@ -63,3 +63,14 @@
   color: #f12222;
   text-decoration: none;
 }
+
+.adminLink {
+    color: #f59e0b !important;
+    font-weight: 700;
+}
+
+.userGreeting {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-right: 0.5rem;
+}

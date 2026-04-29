@@ -1,193 +1,153 @@
 import { Request, Response } from "express";
 import {
-  getAllAppointmentsService,
-  getAppointmentByIdService,
-  createAppointmentService,
-  cancelAppointmentService,
-  deleteAppointmentService
+    getAllAppointmentsService,
+    getAppointmentByIdService,
+    createAppointmentService,
+    cancelAppointmentService,
+    deleteAppointmentService,
+    getAppointmentsByUserIdService,
+    updateAppointmentAdminService,
+    getAvailableSlotsService
 } from "../services/appointmentService";
-import { Appointment } from "../entities/Appointment";
-import { getAppointmentsByUserIdService } from "../services/appointmentService";
-
-// Importamos la función para enviar correos de confirmación y de cancelación
 import { sendAppointmentConfirmationEmail, sendAppointmentCancellationEmail } from "../services/emailService";
 
-/**
- * GET /appointments
- * Obtener el listado de todos los turnos de todos los usuarios.
- */
 export const getAppointmentsController = async (req: Request, res: Response) => {
-  try {
-    const appointments: Appointment[] = await getAllAppointmentsService();
-    res.status(200).json(appointments);
-  } catch (error) {
-    res.status(500).json({
-      message: "Error al obtener los turnos",
-      error,
-    });
-  }
+    try {
+        const appointments = await getAllAppointmentsService();
+        res.status(200).json(appointments);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener los turnos", error });
+    }
 };
 
-/**
- * GET /appointments/:id
- * Obtener el detalle de un turno específico.
- */
 export const getAppointmentIdController = async (req: Request, res: Response) => {
-  try {
-    // Se asume que el ID llega como parámetro de ruta, ej: /appointments/123
-    const { id } = req.params;
-    const appointment: Appointment | null = await getAppointmentByIdService(Number(id));
-    if (!appointment) {
-      return res.status(404).json({ message: "No se encontró el turno" });
+    try {
+        const appointment = await getAppointmentByIdService(Number(req.params.id));
+        if (!appointment) return res.status(404).json({ message: "No se encontró el turno" });
+        res.status(200).json(appointment);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener el turno", error });
     }
-    res.status(200).json(appointment);
-  } catch (error) {
-    res.status(500).json({
-      message: "Error al obtener el turno",
-      error,
-    });
-  }
 };
 
-/**
- * POST /appointments/schedule
- * Agendar un nuevo turno.
- *
- * Se encarga de:
- * 1. Crear el turno en la base de datos.
- * 2. Si la creación es exitosa, enviar un correo de confirmación al usuario.
- */
 export const createAppointmentController = async (req: Request, res: Response) => {
-  try {
-    const { date, time, userId,comentarios } = req.body;
-    // Convertimos `date` a un objeto Date y `userId` a number
-    const newAppointment: Appointment | null = await createAppointmentService(
-      new Date(date),
-      time,
-      Number(userId),
-      comentarios
-    );
+    try {
+        const {
+            date, time, userId,
+            descripcionFalla, vehicleBrand, vehicleModel, vehiclePlate, vehicleYear,
+            repairType, adminNotes, adminMessage, estimatedDuration, comentarios
+        } = req.body;
 
-    if (!newAppointment) {
-      return res.status(400).json({ message: "No se pudo crear el turno (usuario inexistente)" });
+        const newAppointment = await createAppointmentService({
+            date: new Date(date),
+            time,
+            userId: Number(userId),
+            descripcionFalla,
+            vehicleBrand,
+            vehicleModel,
+            vehiclePlate,
+            vehicleYear,
+            repairType,
+            adminNotes,
+            adminMessage,
+            estimatedDuration,
+            comentarios
+        });
+
+        if (!newAppointment) return res.status(400).json({ message: "No se pudo crear el turno (usuario inexistente)" });
+
+        if (newAppointment.user) {
+            try {
+                await sendAppointmentConfirmationEmail({
+                    appointmentId: newAppointment.id,
+                    date: newAppointment.date.toISOString(),
+                    time: newAppointment.time,
+                    userName: newAppointment.user.name,
+                    userEmail: newAppointment.user.email,
+                    comentarios: newAppointment.comentarios || ""
+                });
+            } catch (e) { /* no bloquear si falla el email */ }
+        }
+
+        res.status(201).json(newAppointment);
+    } catch (error) {
+        res.status(500).json({ message: "Error al crear el turno", error });
     }
-
-    // Enviar el correo de confirmación sólo si la relación con el usuario está definida
-    if (newAppointment.user) {
-      // Construimos el objeto de datos para el correo de confirmación
-      const appointmentData = {
-        appointmentId: newAppointment.id,
-        date: newAppointment.date.toISOString(), // Convertimos a ISO para estandarizar la fecha
-        time: newAppointment.time,
-        userName: newAppointment.user.name,
-        userEmail: newAppointment.user.email,
-        comentarios: (newAppointment as any).comentarios || ""
-      };
-
-      try {
-        await sendAppointmentConfirmationEmail(appointmentData);
-        console.log("✅ Correo de confirmación enviado a:", newAppointment.user.email);
-      } catch (emailError: any) {
-        console.error("❌ Error al enviar el correo de confirmación:", emailError.message || emailError);
-        // Decisión: continuar sin fallar la petición
-      }
-    } else {
-      console.warn("⚠️ El turno creado no tiene usuario asociado para enviar el correo de confirmación.");
-    }
-
-    res.status(201).json(newAppointment);
-  } catch (error) {
-    res.status(500).json({
-      message: "Error al crear el turno",
-      error,
-    });
-  }
 };
 
-/**
- * PUT /appointments/cancel/:id
- * Cambiar el estatus de un turno a “cancelled” y enviar un correo de confirmación de cancelación.
- */
 export const updateAppointmentController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params; // Se recibe el ID del turno en la URL
+    try {
+        const appointment = await getAppointmentByIdService(Number(req.params.id));
+        if (!appointment) return res.status(404).json({ message: "No se encontró el turno a cancelar" });
 
-    // Obtenemos primero el turno para tener sus datos
-    const appointment = await getAppointmentByIdService(Number(id));
-    if (!appointment) {
-      return res.status(404).json({ message: "No se encontró el turno a cancelar" });
+        const success = await cancelAppointmentService(Number(req.params.id));
+        if (!success) return res.status(404).json({ message: "No se encontró el turno a cancelar" });
+
+        if (appointment.user) {
+            try {
+                await sendAppointmentCancellationEmail({
+                    appointmentId: appointment.id,
+                    date: appointment.date.toISOString(),
+                    time: appointment.time,
+                    userName: appointment.user.name,
+                    userEmail: appointment.user.email,
+                });
+            } catch (e) { /* no bloquear */ }
+        }
+
+        res.status(200).json({ message: "Turno cancelado exitosamente" });
+    } catch (error) {
+        res.status(500).json({ message: "Error al cancelar el turno", error });
     }
-
-    // Cancelamos el turno
-    const success = await cancelAppointmentService(Number(id));
-    if (!success) {
-      return res.status(404).json({ message: "No se encontró el turno a cancelar" });
-    }
-
-    // Enviar el correo de cancelación solo si el usuario está asociado al turno
-    if (appointment.user) {
-      const cancellationData = {
-        appointmentId: appointment.id,
-        date: appointment.date.toISOString(),
-        time: appointment.time,
-        userName: appointment.user.name,
-        userEmail: appointment.user.email,
-        
-      };
-      try {
-        await sendAppointmentCancellationEmail(cancellationData);
-        console.log("✅ Correo de cancelación enviado a:", appointment.user.email);
-      } catch (emailError: any) {
-        console.error("❌ Error al enviar el correo de cancelación:", emailError.message || emailError);
-        // Continuamos sin fallar la petición
-      }
-    } else {
-      console.warn("⚠️ El turno cancelado no tiene usuario asociado para enviar el correo de cancelación.");
-    }
-
-    res.status(200).json({ message: "Turno cancelado exitosamente" });
-  } catch (error) {
-    res.status(500).json({
-      message: "Error al cancelar el turno",
-      error,
-    });
-  }
 };
 
-/**
- * GET /appointments/user/:userId
- * Obtener todos los turnos de un usuario específico.
- */
 export const getAppointmentsByUserController = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params;
-    // Este servicio trae todos los turnos del usuario cuyo ID es userId
-    const appointments: Appointment[] = await getAppointmentsByUserIdService(Number(userId));
-    res.status(200).json(appointments);
-  } catch (error) {
-    res.status(500).json({
-      message: "Error al obtener los turnos del usuario",
-      error,
-    });
-  }
-};
-/**
- * DELETE /appointments/:id
- * Elimina un turno de la base de datos.
- */
-export const deleteAppointmentController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    // Llamamos al service para eliminar el turno
-    const success = await deleteAppointmentService(Number(id));
-    if (!success) {
-      return res.status(404).json({ message: "Turno no encontrado para eliminar" });
+    try {
+        const appointments = await getAppointmentsByUserIdService(Number(req.params.userId));
+        res.status(200).json(appointments);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener los turnos del usuario", error });
     }
-    res.status(200).json({ message: "Turno eliminado exitosamente" });
-  } catch (error) {
-    res.status(500).json({
-      message: "Error al eliminar el turno",
-      error,
-    });
-  }
+};
+
+export const deleteAppointmentController = async (req: Request, res: Response) => {
+    try {
+        const success = await deleteAppointmentService(Number(req.params.id));
+        if (!success) return res.status(404).json({ message: "Turno no encontrado para eliminar" });
+        res.status(200).json({ message: "Turno eliminado exitosamente" });
+    } catch (error) {
+        res.status(500).json({ message: "Error al eliminar el turno", error });
+    }
+};
+
+// ADMIN: editar datos de un turno (fecha, hora, notas, mensaje, duración, tipo reparación)
+export const updateAppointmentAdminController = async (req: Request, res: Response) => {
+    try {
+        const { date, time, adminNotes, adminMessage, estimatedDuration, repairType } = req.body;
+        const updates: any = {};
+        if (date) updates.date = new Date(date);
+        if (time) updates.time = time;
+        if (adminNotes !== undefined) updates.adminNotes = adminNotes;
+        if (adminMessage !== undefined) updates.adminMessage = adminMessage;
+        if (estimatedDuration !== undefined) updates.estimatedDuration = estimatedDuration;
+        if (repairType !== undefined) updates.repairType = repairType;
+
+        const updated = await updateAppointmentAdminService(Number(req.params.id), updates);
+        if (!updated) return res.status(404).json({ message: "Turno no encontrado" });
+        res.status(200).json(updated);
+    } catch (error) {
+        res.status(500).json({ message: "Error al actualizar el turno", error });
+    }
+};
+
+// Horarios disponibles para una fecha
+export const getAvailableSlotsController = async (req: Request, res: Response) => {
+    try {
+        const { date } = req.query;
+        if (!date || typeof date !== "string") return res.status(400).json({ message: "Se requiere el parámetro 'date' (YYYY-MM-DD)" });
+        const slots = await getAvailableSlotsService(date);
+        res.status(200).json({ date, slots });
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener los horarios", error });
+    }
 };

@@ -1,140 +1,59 @@
-/* Contenedor principal de la tarjeta */
 .card {
-  background-image: url("../../assets/images/Gestion-de-Turnos.png");
-  position: relative; /* Para posicionar el overlay y el botón de cerrar */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1.2rem;
-  margin-bottom: 1rem;    
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  
-  /* Aplicamos un overlay blanco semitransparente para que el texto sea legible */
-  overflow: hidden; /* Evitamos que el pseudo-elemento se salga */
-  transition: transform 0.2s, box-shadow 0.2s;
+    list-style: none;
+    background: #fff;
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    margin-bottom: 0.75rem;
 }
 
-/* Overlay para mejorar la legibilidad */
-.card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.85);
-  z-index: 0;
-  border-radius: 8px;
-}
+.active { border-left: 4px solid #2563eb; }
+.cancelled { border-left: 4px solid #f87171; opacity: 0.7; }
 
-/* Aseguramos que el contenido de la tarjeta quede por encima del overlay */
-.card > * {
-  position: relative;
-  z-index: 1;
-}
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+.time { font-size: 1.05rem; font-weight: 700; color: #2563eb; }
 
-/* Botón para descartar la tarjeta (close) */
-/* Se actualizó el estilo para crear un botón con más estilo, con fondo redondo, sombra y efecto hover */
-.closeButton {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  width: 2rem;
-  height: 2rem;
-  border: none;
-  background-color: #ff4d4d;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: bold;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-}
+.badge { font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.65rem; border-radius: 20px; }
+.badgeActive { background: #dcfce7; color: #16a34a; }
+.badgeCancelled { background: #fee2e2; color: #dc2626; }
 
-.closeButton:hover {
-  background-color: #e60000;
-  transform: scale(1.1);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
+.date { color: #374151; font-size: 0.9rem; margin: 0.2rem 0; text-transform: capitalize; }
+.info { color: #4b5563; font-size: 0.88rem; margin: 0.2rem 0; }
+.falla { color: #64748b; font-size: 0.85rem; margin: 0.3rem 0; }
+.comentarios { color: #94a3b8; font-size: 0.82rem; margin: 0.2rem 0; }
 
-/* Efecto hover: la tarjeta se eleva ligeramente */
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+.adminMsg {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 7px;
+    padding: 0.6rem 0.85rem;
+    margin: 0.5rem 0;
 }
+.adminMsg span { font-size: 0.8rem; font-weight: 700; color: #92400e; }
+.adminMsg p { margin: 0.2rem 0 0; font-size: 0.88rem; color: #78350f; }
 
-/* Estilos generales para los párrafos dentro de la tarjeta */
-.card p {
-  margin: 0.3rem 0;
-  font-size: 0.95rem;
-  color: #333;
-}
+.actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
 
-/* Contenedor para alinear el estado y el botón en una misma línea */
-.statusContainer {
-  display: flex;
-  align-items: center;
+.cancelBtn {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 7px;
+    padding: 0.45rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
 }
+.cancelBtn:hover { background: #fecaca; }
 
-/* Clase para representar el estado del turno */
-.state {
-  font-weight: bold;
-  padding: 0.3rem 0.6rem;
-  border-radius: 4px;
-  display: inline-block;
-  font-size: 0.9rem;
+.dismissBtn {
+    background: #f1f5f9;
+    color: #64748b;
+    border: none;
+    border-radius: 7px;
+    padding: 0.45rem 1rem;
+    font-size: 0.85rem;
+    cursor: pointer;
 }
-
-/* Estilo para turno ACTIVO */
-.active {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-/* Estilo para turno CANCELADO */
-.cancelled {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-/* Estilos para el botón de cancelar turno */
-.cancelButton {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 0.3rem 0.6rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.2s, transform 0.2s;
-  margin-left: 1rem;
-}
-
-.cancelButton:hover {
-  background-color: #c82333;
-  transform: scale(1.05);
-}
-
-.cancelButton:disabled {
-  background-color: #ccc;
-  color: #666;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Contenedor de comentarios */
-.comments {
-  font-size: 0.9rem;
-  color: #333;
-  margin: 0.5rem 0;
-  padding: 0.3rem 0.6rem;
-  border-top: 1px dashed #ccc;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-}
+.dismissBtn:hover { background: #e2e8f0; }

@@ -1,29 +1,37 @@
 import { Router } from "express";
 import {
-  getAppointmentsController,
-  getAppointmentIdController,
-  createAppointmentController,
-  updateAppointmentController,
-  getAppointmentsByUserController,
-  deleteAppointmentController
+    getAppointmentsController,
+    getAppointmentIdController,
+    createAppointmentController,
+    updateAppointmentController,
+    getAppointmentsByUserController,
+    deleteAppointmentController,
+    updateAppointmentAdminController,
+    getAvailableSlotsController
 } from "../controllers/appointmentsController";
 
 export const appointmentsRouter = Router();
 
-// GET /appointments
+// Horarios disponibles: GET /appointments/slots?date=YYYY-MM-DD
+appointmentsRouter.get("/slots", getAvailableSlotsController);
+
+// Todos los turnos (admin)
 appointmentsRouter.get("/", getAppointmentsController);
 
-// GET /appointments/:id
-appointmentsRouter.get("/:id", getAppointmentIdController);
-
-// POST /appointments/schedule
-appointmentsRouter.post("/schedule", createAppointmentController);
-
-// PUT /appointments/cancel/:id
-appointmentsRouter.put("/cancel/:id", updateAppointmentController);
-
-// GET /appointments/user/:userId
+// Turnos por usuario
 appointmentsRouter.get("/user/:userId", getAppointmentsByUserController);
 
-// DELETE /appointments/:id  --> Nueva ruta para eliminar un turno
+// Turno por ID
+appointmentsRouter.get("/:id", getAppointmentIdController);
+
+// Crear turno
+appointmentsRouter.post("/schedule", createAppointmentController);
+
+// Cancelar turno
+appointmentsRouter.put("/cancel/:id", updateAppointmentController);
+
+// Admin: editar turno (fecha, notas, mensaje, duración)
+appointmentsRouter.patch("/admin/:id", updateAppointmentAdminController);
+
+// Eliminar turno
 appointmentsRouter.delete("/:id", deleteAppointmentController);
