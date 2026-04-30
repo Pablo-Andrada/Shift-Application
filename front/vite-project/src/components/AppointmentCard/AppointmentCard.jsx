@@ -17,40 +17,30 @@ const AppointmentCard = ({ id, date, time, status, repairType, vehicleBrand, veh
 
             <p className={styles.date}>📅 {formattedDate}</p>
 
-            {(vehicleBrand || vehicleModel) && (
-                <p className={styles.info}>🚗 {vehicleBrand} {vehicleModel} {vehiclePlate ? `— ${vehiclePlate}` : ""}</p>
-            )}
+            <div className={styles.infoRow}>
+                {(vehicleBrand || vehicleModel) && (
+                    <span className={styles.info}>🚗 {vehicleBrand} {vehicleModel}{vehiclePlate ? ` — ${vehiclePlate}` : ""}</span>
+                )}
+                {repairType && <span className={styles.info}>🔧 {repairType}</span>}
+                {estimatedDuration > 0 && <span className={styles.info}>⏱ {estimatedDuration} min estimados</span>}
+            </div>
 
-            {repairType && <p className={styles.info}>🔧 {repairType}</p>}
+            {descripcionFalla && <p className={styles.falla}>💬 {descripcionFalla}</p>}
+            {comentarios && <p className={styles.info}>📋 {comentarios}</p>}
 
-            {descripcionFalla && (
-                <p className={styles.falla}>💬 <em>{descripcionFalla}</em></p>
-            )}
-
-            {estimatedDuration > 0 && (
-                <p className={styles.info}>⏱ Duración estimada: {estimatedDuration} min</p>
-            )}
-
-            {/* Mensaje del admin al cliente */}
             {adminMessage && (
                 <div className={styles.adminMsg}>
-                    <span>📩 Mensaje del taller:</span>
-                    <p>{adminMessage}</p>
+                    <span className={styles.adminMsgLabel}>📩 Mensaje del taller</span>
+                    <p className={styles.adminMsgText}>{adminMessage}</p>
                 </div>
             )}
 
-            {comentarios && <p className={styles.comentarios}>📋 {comentarios}</p>}
-
             <div className={styles.actions}>
                 {status === "active" && (
-                    <button onClick={() => onCancel(id)} className={styles.cancelBtn}>
-                        Cancelar turno
-                    </button>
+                    <button onClick={() => onCancel(id)} className={styles.cancelBtn}>Cancelar turno</button>
                 )}
                 {status === "cancelled" && (
-                    <button onClick={() => onDismiss(id)} className={styles.dismissBtn}>
-                        Eliminar
-                    </button>
+                    <button onClick={() => onDismiss(id)} className={styles.dismissBtn}>Eliminar</button>
                 )}
             </div>
         </li>

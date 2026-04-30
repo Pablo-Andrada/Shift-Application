@@ -9,17 +9,20 @@ const NavBar = () => {
 
     if (typeof user === "undefined") return null;
 
-    const handleLogout = () => {
-        logoutUser();
-        navigate("/");
-    };
+    const handleLogout = () => { logoutUser(); navigate("/"); };
 
     return (
         <nav className={styles.nav}>
-            <h1 className={styles.title}>Taller Mecánica Avanzada</h1>
+            <div className={styles.brand}>
+                <span className={styles.brandIcon}>🔧</span>
+                <h1 className={styles.title}>
+                    Mecánica <span className={styles.titleAccent}>Avanzada</span>
+                </h1>
+            </div>
+
             <ul className={styles.navList}>
                 <li className={styles.navItem}>
-                    <Link to="/" className={styles.navLink}>Home</Link>
+                    <Link to="/" className={styles.navLink}>Inicio</Link>
                 </li>
 
                 {user && !isAdmin && (
@@ -40,16 +43,25 @@ const NavBar = () => {
                     <Link to="/contacto" className={styles.navLink}>Contacto</Link>
                 </li>
                 <li className={styles.navItem}>
-                    <Link to="/about" className={styles.navLink}>About</Link>
+                    <Link to="/about" className={styles.navLink}>Nosotros</Link>
                 </li>
 
-                {user && (
+                {user ? (
                     <li className={styles.navItem}>
                         <span className={styles.userGreeting}>Hola, {user.name.split(" ")[0]}</span>
-                        <button onClick={handleLogout} className={`${styles.navLink} ${styles.navButton}`}>
-                            Cerrar sesión
+                        <button onClick={handleLogout} className={styles.navButton}>
+                            Salir
                         </button>
                     </li>
+                ) : (
+                    <>
+                        <li className={styles.navItem}>
+                            <Link to="/login" className={styles.navLink}>Ingresar</Link>
+                        </li>
+                        <li className={styles.navItem}>
+                            <Link to="/register" className={styles.navLink}>Registrarse</Link>
+                        </li>
+                    </>
                 )}
             </ul>
         </nav>

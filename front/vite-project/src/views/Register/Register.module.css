@@ -1,109 +1,145 @@
-/* src/views/Register/Register.module.css */
-
-.container {
-  position: fixed !important;       /* Forzamos que el contenedor se posicione como modal */
-  top: 50% !important;              /* Centrado vertical */
-  left: 50% !important;             /* Centrado horizontal */
-  transform: translate(-50%, -50%) !important; /* Ajuste para el centrado exacto */
-  
-  width: 90% !important;            /* Ocupa 90% del ancho en dispositivos pequeños */
-  max-width: 400px !important;      /* Ancho máximo de 400px en dispositivos grandes */
-  padding: 1.5rem !important;       /* Espaciado interno */
-  background-color: #fff !important;/* Fondo blanco */
-  border-radius: 8px !important;    /* Bordes redondeados */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* Sombra sutil */
-  z-index: 9999 !important;         /* Se asegura que esté por encima */  
+.page {
+  min-height: calc(100vh - 64px);
+  background: linear-gradient(160deg, var(--blue-900) 0%, var(--blue-700) 50%, var(--blue-800) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
 }
 
-/* Título del formulario */
-.title {
-  font-size: 1.8rem;
+.card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: var(--shadow-xl);
+}
+
+.logoArea {
   text-align: center;
   margin-bottom: 1.5rem;
-  color: #333;
 }
 
-/* Estilos para el formulario */
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.logoIcon { font-size: 2rem; display: block; margin-bottom: 0.4rem; }
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin-bottom: 0.2rem;
 }
 
-/* Grupo de inputs */
-.formGroup {
-  display: flex;
-  flex-direction: column;
+.subtitle { font-size: 0.88rem; color: var(--gray-500); }
+
+.form { display: flex; flex-direction: column; gap: 0.85rem; }
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
 }
 
-/* Etiquetas */
+.formGroup { display: flex; flex-direction: column; gap: 0.3rem; }
+
 .formGroup label {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  color: #333;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gray-700);
 }
 
-/* Inputs */
 .formGroup input {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
+  padding: 0.65rem 0.85rem;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-size: 0.92rem;
+  color: var(--gray-800);
+  background: var(--gray-50);
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 
-/* Mensajes */
+.formGroup input:focus {
+  outline: none;
+  border-color: var(--blue-500);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  background: var(--white);
+}
+
+.submitButton {
+  margin-top: 0.5rem;
+  padding: 0.8rem;
+  background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.submitButton:hover { opacity: 0.92; transform: translateY(-1px); }
+.submitButton:disabled { background: var(--gray-300); box-shadow: none; cursor: not-allowed; transform: none; }
+
 .successMessage {
+  background: var(--green-100);
+  color: var(--green-600);
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.87rem;
   text-align: center;
-  color: green;
-  font-weight: bold;
-  margin-bottom: 1rem;
+  border: 1px solid #bbf7d0;
+  margin-bottom: 0.5rem;
 }
 
 .errorMessage {
+  background: var(--red-100);
+  color: var(--red-600);
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.87rem;
   text-align: center;
-  color: red;
-  font-weight: bold;
-  margin-bottom: 1rem;
+  border: 1px solid var(--red-100);
+  margin-bottom: 0.5rem;
 }
 
-/* Botón de envío */
-.submitButton {
-  padding: 0.7rem 1.2rem;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.submitButton:hover {
-  background-color: #0056b3;
-}
-
-.submitButton:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.adminSection {
+  border-top: 1px dashed var(--gray-200);
+  padding-top: 0.75rem;
+  margin-top: 0.25rem;
 }
 
 .adminToggle {
-    background: none;
-    border: none;
-    color: #64748b;
-    font-size: 0.8rem;
-    cursor: pointer;
-    padding: 0.25rem 0;
-    text-decoration: underline;
-    display: block;
-    margin-bottom: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--gray-400);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
+.adminToggle:hover { color: var(--gray-600); }
+
 .adminCodeInput {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px dashed #94a3b8;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    background: #f8fafc;
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border: 1.5px dashed var(--blue-400);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  background: var(--blue-50);
+  color: var(--gray-800);
 }
+
+.footer {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.84rem;
+  color: var(--gray-500);
+}
+
+.footer a { color: var(--blue-500); font-weight: 600; }
+.footer a:hover { text-decoration: underline; }

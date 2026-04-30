@@ -1,224 +1,259 @@
-/* src/views/Home/Home.module.css */
-
-/* Contenedor principal del Home, con fondo, imagen de fondo y disposición en columna */
-.homeContainer {
-  min-height: 100vh;
-  background: url("../../assets/images/Imagen-taller-mecanico.jpg") no-repeat center center / cover;
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  font-family: 'Roboto', sans-serif;
+/* ── Hero (sin usuario) ── */
+.hero {
+    min-height: calc(100vh - 64px);
+    background: url("../../assets/images/Imagen-taller-mecanico.jpg") no-repeat center center / cover;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
 }
 
-/* Título principal, usado para el saludo y otros encabezados */
-.title {
-  color: #fff;
-  font-size: 2rem;
-  margin: 0;
-  padding-top: 5rem;
-  padding-left: 2rem;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+.heroOverlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(13,27,46,0.82) 0%, rgba(26,43,74,0.72) 100%);
 }
 
-/* Contenedor para los botones de autenticación cuando no hay usuario */
-.authButtonsContainer {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
+.heroContent {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 620px;
 }
 
-/* Botones de acción (para Login, Register) */
-.actionButton {
-  background-color:rgb(50, 53, 54);
-  color: #fff;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.2s, transform 0.2s;
+.heroLabel {
+    display: inline-block;
+    background: var(--red-600);
+    color: var(--white);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.9rem;
+    border-radius: 20px;
+    margin-bottom: 1rem;
 }
 
-.actionButton:hover {
-  background-color: #053a72;
-  transform: scale(1.05);
+.heroTitle {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.03em;
 }
 
-/* Contenedor principal que divide el layout en 2 columnas */
-.layoutContainer {
-  display: flex;
-  flex-direction: row;
-  gap: 2rem;
-  margin-top: 2rem;
-  width: 100%;
-  justify-content: center;
+.heroTitle span { color: var(--red-400); }
+
+.heroSubtitle {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 2rem;
+    line-height: 1.6;
 }
 
-/* Columna Izquierda */
-.leftColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  flex: 1;
+.heroButtons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
-/* Columna Derecha */
-.rightColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  flex: 1;
+.btnPrimary {
+    background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+    color: var(--white);
+    border: none;
+    padding: 0.75rem 1.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.4);
+    transition: opacity var(--transition), transform var(--transition);
+}
+.btnPrimary:hover { opacity: 0.9; transform: translateY(-2px); }
+
+.btnOutline {
+    background: rgba(255,255,255,0.1);
+    color: var(--white);
+    border: 2px solid rgba(255,255,255,0.4);
+    padding: 0.75rem 1.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background var(--transition), border-color var(--transition);
+}
+.btnOutline:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.7); }
+
+/* ── Dashboard (con usuario) ── */
+.dashboard {
+    min-height: calc(100vh - 64px);
+    background: var(--gray-100);
+    padding: 2rem 1rem;
 }
 
-/* =========================== */
-/* Estructura base para cada widget */
-/* =========================== */
-.widgetContainer {
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  width: 100%;
-  text-align: center;
-  margin: 0 auto;
+.dashContainer { max-width: 980px; margin: 0 auto; }
+
+.dashHeader { margin-bottom: 1.75rem; }
+
+.dashGreeting {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--gray-900);
+    margin-bottom: 0.2rem;
 }
 
-/* Encabezado del widget: se diferencia con fondo gris semitransparente y padding */
+.dashGreeting span { color: var(--blue-600); }
+
+.dashSubtitle { font-size: 0.9rem; color: var(--gray-500); }
+
+.dashLayout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+/* Widgets */
+.widget {
+    background: var(--white);
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
 .widgetHeader {
-  background-color: rgba(220, 220, 220, 0.85);
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  padding: 0.75rem 1rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #333;
-  border-bottom: 1px solid #ccc;
+    background: linear-gradient(135deg, var(--blue-800), var(--blue-700));
+    padding: 0.75rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-/* Cuerpo del widget */
-.widgetBody {
-  padding: 1rem;
+.widgetTitle {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
 }
 
-/* =========================== */
-/* Detalles del Próximo Turno */
-/* =========================== */
-.nextAppointmentDetails {
-  font-size: 1rem;
-  color: #555;
+.widgetBody { padding: 1.1rem; }
+
+/* Próximo turno */
+.nextCard {
+    background: linear-gradient(135deg, var(--blue-50), var(--white));
+    border: 1.5px solid var(--blue-100);
+    border-radius: var(--radius-md);
+    padding: 0.9rem 1rem;
 }
 
-/* =========================== */
-/* Historial de Turnos */
-/* =========================== */
-.historyList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.nextDate {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--blue-700);
+    margin-bottom: 0.25rem;
+    text-transform: capitalize;
 }
+
+.nextTime {
+    font-size: 0.88rem;
+    color: var(--gray-600);
+    margin-bottom: 0.35rem;
+}
+
+.nextRepair {
+    font-size: 0.82rem;
+    color: var(--gray-500);
+}
+
+.noNext {
+    text-align: center;
+    color: var(--gray-400);
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+}
+
+/* Historial */
+.historyList { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
 
 .historyItem {
-  font-size: 0.95rem;
-  color: #555;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.86rem;
+    color: var(--gray-600);
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+.historyItem:last-child { border-bottom: none; }
+
+.historyDate { font-weight: 500; }
+.historyTime { color: var(--gray-400); }
+
+/* Badges */
+.badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.18rem 0.55rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.badgeActive    { background: var(--green-100); color: var(--green-600); }
+.badgeCancelled { background: var(--red-100);   color: var(--red-600); }
+
+/* Calendario */
+.calendarWrapper :global(.react-calendar) {
+    width: 100%;
+    border: none;
+    font-family: var(--font);
+    font-size: 0.88rem;
 }
 
-.historyItem:last-child {
-  border-bottom: none;
+.calendarWrapper :global(.react-calendar__navigation button) {
+    color: var(--blue-700);
+    font-weight: 700;
 }
 
-.historyDetails {
-  text-align: center;
-  font-size: 0.95rem;
-  color: #555;
+.calendarWrapper :global(.react-calendar__tile--active) {
+    background: var(--blue-600) !important;
+    color: var(--white) !important;
+    border-radius: var(--radius-sm);
 }
 
-/* =========================== */
-/* Insignias para el estado del turno */
-/* =========================== */
-.statusBadge {
-  display: inline-block;
-  padding: 0.3rem 0.6rem;
-  border-radius: 9999px; /* Efecto pill */
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-left: 0.5rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  color: #fff;
+.calendarWrapper :global(.react-calendar__tile:hover) {
+    background: var(--blue-50);
 }
 
-.activeBadge {
-  background-color: #28a745; /* Verde */
-}
-
-.cancelledBadge {
-  background-color: #dc3545; /* Rojo */
-}
-
-/* =========================== */
-/* Calendario de Turnos */
-/* =========================== */
 .turnoIndicator {
-  margin-top: 2px;
-  height: 6px;
-  width: 6px;
-  background-color: #28a745; /* Verde para indicar turnos */
-  border-radius: 50%;
-  margin-left: auto;
-  margin-right: auto;
+    width: 6px;
+    height: 6px;
+    background: var(--red-500);
+    border-radius: 50%;
+    margin: 1px auto 0;
 }
 
-/* =========================== */
-/* Turnos del Día Seleccionado */
-/* =========================== */
-.dayTurnosList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+/* Turnos del día */
+.dayList { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+
+.dayItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.86rem;
+    padding: 0.45rem 0.6rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--blue-400);
 }
 
-.dayTurnoItem {
-  font-size: 0.95rem;
-  color: #555;
-  padding: 0.3rem 0;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-}
+.noDay { text-align: center; color: var(--gray-400); font-size: 0.88rem; padding: 0.5rem 0; }
 
-.noTurnosMessage {
-  font-size: 0.95rem;
-  color: #555;
-  text-align: center;
-  margin-top: 0.5rem;
+@media (max-width: 700px) {
+    .dashLayout { grid-template-columns: 1fr; }
+    .heroTitle { font-size: 2rem; }
 }
-
-/* =========================== */
-/* Estilos para el Calendario y Resumen del Día */
-/* (Puedes ajustar estos estilos para lograr la estética deseada) */
-.calendarContainer {
-  /* Ejemplo: agrega margen y redondeo si es necesario */
-  margin: 1rem auto;
-  max-width: 400px;
-}
-
-.dayTurnosTitle {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
-  background-color: rgba(220, 220, 220, 0.85);
-  padding: 0.5rem;
-  border-radius: 4px;
-  text-align: center;
-}
-
-/* Puedes agregar más estilos específicos para el resumen del día si lo deseas */

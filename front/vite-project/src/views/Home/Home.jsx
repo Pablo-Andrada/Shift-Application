@@ -1,312 +1,219 @@
-// src/views/Home/Home.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import Calendar from "react-calendar"; // Calendario interactivo
-import "react-calendar/dist/Calendar.css"; // Estilos por defecto de react-calendar
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 import styles from "./Home.module.css";
-import useUserContext from "../../hooks/useUserContext"; // Hook del contexto de usuario
-
-// Importamos el componente Modal para los formularios de Login y Register
+import useUserContext from "../../hooks/useUserContext";
 import Modal from "../../components/Modal/Modal";
 import Login from "../Login/Login";
 import Register from "../Register/Register";
+import { useNavigate } from "react-router-dom";
 
-const API = import.meta.env.VITE_API_URL;
+const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-/**
- * Función que ajusta la fecha recibida (en formato ISO) sumándole el desfase de la zona horaria.
- * Esto permite que la fecha se muestre correctamente en la hora local del navegador.
- *
- * @param {string} dateStr - La fecha en formato ISO proveniente del backend.
- * @returns {Date} La fecha ajustada a la hora local.
- */
 const adjustDate = (dateStr) => {
-  const date = new Date(dateStr);
-  // Suma el desfase (en milisegundos) que el navegador aplica a la fecha
-  const adjusted = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
-  return adjusted;
+    const date = new Date(dateStr);
+    return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
 };
 
-/**
- * Función helper para convertir un string de hora en formato "HH:MM AM/PM" a minutos.
- * Permite ordenar los turnos de un día en orden cronológico.
- *
- * @param {string} timeStr - Formato "HH:MM AM" o "HH:MM PM".
- * @returns {number} Minutos totales desde la medianoche.
- */
-const parseTime = (timeStr) => {
-  const [time, modifier] = timeStr.split(" ");
-  let [hours, minutes] = time.split(":").map(Number);
-  if (modifier === "PM" && hours !== 12) {
-    hours += 12;
-  }
-  if (modifier === "AM" && hours === 12) {
-    hours = 0;
-  }
-  return hours * 60 + minutes;
-};
-
-/**
- * Componente Home
- *
- * - Muestra un saludo si hay un usuario logueado.
- * - Si el usuario está logueado, muestra 2 columnas:
- *   - Izquierda: Próximo turno y mini-historial (últimos 3).
- *   - Derecha: Calendario de turnos y turnos para la fecha seleccionada.
- * - Si no hay usuario, muestra un mensaje genérico y botones de Login/Register.
- */
 function Home() {
-  // Obtenemos el usuario actual desde el contexto global
-  const { user } = useUserContext();
+    const { user, isAdmin } = useUserContext();
+    const navigate = useNavigate();
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+    const [allAppointments, setAllAppointments] = useState([]);
+    const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // Manejo de modales (Login y Register)
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+    const fetchAppointments = useCallback(async () => {
+        if (!user || isAdmin) return;
+        try {
+            const res = await fetch(`${API}/appointments/user/${user.id}`);
+            if (res.ok) setAllAppointments(await res.json());
+        } catch (_) {}
+    }, [user, isAdmin]);
 
-  // Estado para el próximo turno activo
-  const [nextAppointment, setNextAppointment] = useState(null);
-  // Estado con todos los turnos del usuario
-  const [allAppointments, setAllAppointments] = useState([]);
+    useEffect(() => {
+        fetchAppointments();
+        const interval = setInterval(fetchAppointments, 5000);
+        return () => clearInterval(interval);
+    }, [fetchAppointments]);
 
-  // Fecha seleccionada en el calendario
-  const [selectedDate, setSelectedDate] = useState(new Date());
+    const now = new Date();
+    const upcoming = allAppointments
+        .filter(a => adjustDate(a.date) >= now && a.status === "active")
+        .sort((a, b) => adjustDate(a.date) - adjustDate(b.date));
+    const nextAppt = upcoming[0] || null;
 
-  /**
-   * fetchAppointments:
-   * Obtiene la lista de turnos del backend y determina el próximo turno activo.
-   */
-  const fetchAppointments = useCallback(async () => {
-    if (!user) return; // Si no hay usuario, no hacemos nada
+    const miniHistory = [...allAppointments]
+        .sort((a, b) => adjustDate(b.date) - adjustDate(a.date))
+        .slice(0, 4);
 
-    try {
-      // 1) Pedimos los turnos del usuario al backend
-      const response = await fetch(`${API}/appointments/user/${user.id}`);
-      if (!response.ok) {
-        throw new Error("No se pudieron obtener los turnos.");
-      }
-      const appointments = await response.json();
+    const dailyAppts = allAppointments.filter(a => {
+        const d = adjustDate(a.date);
+        return d.getFullYear() === selectedDate.getFullYear() &&
+               d.getMonth() === selectedDate.getMonth() &&
+               d.getDate() === selectedDate.getDate();
+    });
 
-      // 2) Guardamos todos los turnos en estado
-      setAllAppointments(appointments);
+    const fmtDate = (d) => adjustDate(d).toLocaleDateString("es-AR", { weekday: "short", day: "numeric", month: "short" });
 
-      // 3) Determinamos el "próximo turno activo" comparando la fecha ajustada
-      const now = new Date();
-      const upcomingAppointments = appointments.filter((appt) => {
-        const adjDate = adjustDate(appt.date);
-        return adjDate >= now && appt.status === "active";
-      });
-
-      // Ordenamos por fecha ajustada ascendentemente
-      upcomingAppointments.sort((a, b) => adjustDate(a.date) - adjustDate(b.date));
-
-      // Si hay alguno, guardamos el primero como el más cercano
-      setNextAppointment(upcomingAppointments.length > 0 ? upcomingAppointments[0] : null);
-    } catch (error) {
-      console.error("Error al obtener turnos:", error);
-    }
-  }, [user]);
-
-  /**
-   * useEffect principal:
-   * Al montar el componente y cada cierto intervalo, refresca la lista de turnos.
-   * Así, si creas un turno en MisTurnos, se reflejará aquí (aunque estés en la misma sesión).
-   */
-  useEffect(() => {
-    // Hacemos la primera carga
-    fetchAppointments();
-
-    // Intervalo para refrescar turnos cada 5 segundos
-    const interval = setInterval(() => {
-      fetchAppointments();
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [user, fetchAppointments]);
-
-  /**
-   * miniHistory:
-   * Sacamos los 3 turnos más recientes, sin importar estado, y ajustamos sus fechas.
-   */
-  const miniHistory =
-    allAppointments.length > 0
-      ? [...allAppointments]
-          .sort((a, b) => adjustDate(b.date) - adjustDate(a.date))
-          .slice(0, 3)
-      : [];
-
-  /**
-   * dailyAppointments:
-   * Turnos para la fecha seleccionada en el calendario, ordenados por hora de menor a mayor.
-   */
-  const dailyAppointments = allAppointments
-    .filter((appt) => {
-      const apptDate = adjustDate(appt.date);
-      return (
-        apptDate.getFullYear() === selectedDate.getFullYear() &&
-        apptDate.getMonth() === selectedDate.getMonth() &&
-        apptDate.getDate() === selectedDate.getDate()
-      );
-    })
-    .sort((a, b) => parseTime(a.time) - parseTime(b.time));
-
-  /**
-   * handleDateChange:
-   * Actualiza la fecha seleccionada del calendario.
-   */
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
-
-  return (
-    <div className={styles.homeContainer}>
-      {/** 
-       * Si hay usuario, lo saludamos con su name.
-       * Si no hay, mostramos un título genérico y los botones de Login/Register.
-       */}
-      {user ? (
-        <p className={styles.title}>Hola {user.name} 👋 ¡Bienvenido al taller!</p>
-      ) : (
-        <>
-          <h2 className={styles.title}>Taller Automotriz: Mecánica avanzada al instante.</h2>
-          <div className={styles.authButtonsContainer}>
-            <button onClick={() => setIsLoginOpen(true)} className={styles.actionButton}>
-              Iniciar Sesión
-            </button>
-            <button onClick={() => setIsRegisterOpen(true)} className={styles.actionButton}>
-              Registrarse
-            </button>
-          </div>
-        </>
-      )}
-
-      {/**
-       * Solo mostramos los widgets si el usuario está logueado
-       */}
-      {user && (
-        <div className={styles.layoutContainer}>
-          {/** ==================== Columna Izquierda ==================== */}
-          <div className={styles.leftColumn}>
-            {/** Widget: Tu próximo turno */}
-            <div className={styles.widgetContainer}>
-              <div className={styles.widgetHeader}>Tu próximo turno</div>
-              <div className={styles.widgetBody}>
-                {nextAppointment ? (
-                  <p className={styles.nextAppointmentDetails}>
-                    {adjustDate(nextAppointment.date).toLocaleDateString()} a las {nextAppointment.time}
-                    <span
-                      className={
-                        nextAppointment.status === "active"
-                          ? `${styles.statusBadge} ${styles.activeBadge}`
-                          : `${styles.statusBadge} ${styles.cancelledBadge}`
-                      }
-                    >
-                      {nextAppointment.status}
-                    </span>
-                  </p>
-                ) : (
-                  <p className={styles.nextAppointmentDetails}>No tienes turnos programados.</p>
-                )}
-              </div>
+    // ── Hero (sin usuario) ──
+    if (!user) return (
+        <div className={styles.hero}>
+            <div className={styles.heroOverlay} />
+            <div className={styles.heroContent}>
+                <span className={styles.heroLabel}>Taller Mecánico</span>
+                <h1 className={styles.heroTitle}>
+                    Tu auto en manos <span>expertas</span>
+                </h1>
+                <p className={styles.heroSubtitle}>
+                    Sacá tu turno online en segundos. Sin esperas, sin llamadas.
+                </p>
+                <div className={styles.heroButtons}>
+                    <button className={styles.btnPrimary} onClick={() => setIsLoginOpen(true)}>Iniciar sesión</button>
+                    <button className={styles.btnOutline} onClick={() => setIsRegisterOpen(true)}>Crear cuenta</button>
+                </div>
             </div>
 
-            {/** Widget: Historial de Turnos */}
-            <div className={styles.widgetContainer}>
-              <div className={styles.widgetHeader}>Historial de Turnos</div>
-              <div className={styles.widgetBody}>
-                {miniHistory.length > 0 ? (
-                  <ul className={styles.historyList}>
-                    {miniHistory.map((appt) => (
-                      <li key={appt.id} className={styles.historyItem}>
-                        {adjustDate(appt.date).toLocaleDateString()} - {appt.time} -{" "}
-                        <span
-                          className={
-                            appt.status === "active"
-                              ? `${styles.statusBadge} ${styles.activeBadge}`
-                              : `${styles.statusBadge} ${styles.cancelledBadge}`
-                          }
-                        >
-                          {appt.status}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className={styles.historyDetails}>No hay turnos en tu historial.</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/** ==================== Columna Derecha ==================== */}
-          <div className={styles.rightColumn}>
-            {/** Calendario de Turnos */}
-            <div className={styles.widgetContainer}>
-              <div className={styles.widgetHeader}>Calendario de Turnos</div>
-              <div className={styles.widgetBody}>
-                <Calendar
-                  onChange={handleDateChange}
-                  value={selectedDate}
-                  tileContent={({ date, view }) => {
-                    if (view === "month") {
-                      // ¿Hay turnos en esa fecha?
-                      const hasTurno = allAppointments.some((appt) => {
-                        const apptDate = adjustDate(appt.date);
-                        return (
-                          apptDate.getFullYear() === date.getFullYear() &&
-                          apptDate.getMonth() === date.getMonth() &&
-                          apptDate.getDate() === date.getDate()
-                        );
-                      });
-                      return hasTurno ? <div className={styles.turnoIndicator} /> : null;
-                    }
-                  }}
-                />
-              </div>
-            </div>
-
-            {/** Turnos del día seleccionado */}
-            <div className={styles.widgetContainer}>
-              <div className={styles.widgetHeader}>
-                Turnos para {selectedDate.toLocaleDateString()}
-              </div>
-              <div className={styles.widgetBody}>
-                {dailyAppointments.length > 0 ? (
-                  <ul className={styles.dayTurnosList}>
-                    {dailyAppointments.map((appt) => (
-                      <li key={appt.id} className={styles.dayTurnoItem}>
-                        {adjustDate(appt.date).toLocaleDateString()} - {appt.time} -{" "}
-                        <span
-                          className={
-                            appt.status === "active"
-                              ? `${styles.statusBadge} ${styles.activeBadge}`
-                              : `${styles.statusBadge} ${styles.cancelledBadge}`
-                          }
-                        >
-                          {appt.status}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className={styles.noTurnosMessage}>
-                    No hay turnos programados para este día.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
+            <Modal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)}>
+                <Login onClose={() => setIsLoginOpen(false)} />
+            </Modal>
+            <Modal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)}>
+                <Register onClose={() => setIsRegisterOpen(false)} />
+            </Modal>
         </div>
-      )}
+    );
 
-      {/** Modales de Login y Register */}
-      <Modal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)}>
-        <Login onClose={() => setIsLoginOpen(false)} />
-      </Modal>
+    // ── Dashboard (admin) ──
+    if (isAdmin) return (
+        <div className={styles.dashboard}>
+            <div className={styles.dashContainer}>
+                <div className={styles.dashHeader}>
+                    <h1 className={styles.dashGreeting}>
+                        Hola, <span>{user.name.split(" ")[0]}</span> 👋
+                    </h1>
+                    <p className={styles.dashSubtitle}>Panel de administración del taller</p>
+                </div>
+                <div style={{ textAlign: "center", marginTop: "3rem" }}>
+                    <p style={{ color: "var(--gray-500)", marginBottom: "1rem" }}>
+                        Accedé al panel para gestionar todos los turnos.
+                    </p>
+                    <button className={styles.btnPrimary} onClick={() => navigate("/admin")}>
+                        ⚙️ Ir al Panel Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 
-      <Modal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)}>
-        <Register onClose={() => setIsRegisterOpen(false)} />
-      </Modal>
-    </div>
-  );
+    // ── Dashboard (usuario normal) ──
+    return (
+        <div className={styles.dashboard}>
+            <div className={styles.dashContainer}>
+                <div className={styles.dashHeader}>
+                    <h1 className={styles.dashGreeting}>
+                        Hola, <span>{user.name.split(" ")[0]}</span> 👋
+                    </h1>
+                    <p className={styles.dashSubtitle}>Bienvenido al taller. Aquí podés ver tus turnos.</p>
+                </div>
+
+                <div className={styles.dashLayout}>
+                    {/* Próximo turno */}
+                    <div className={styles.widget}>
+                        <div className={styles.widgetHeader}>
+                            <span className={styles.widgetTitle}>📌 Próximo turno</span>
+                        </div>
+                        <div className={styles.widgetBody}>
+                            {nextAppt ? (
+                                <div className={styles.nextCard}>
+                                    <p className={styles.nextDate}>{fmtDate(nextAppt.date)}</p>
+                                    <p className={styles.nextTime}>🕐 {nextAppt.time}</p>
+                                    {nextAppt.repairType && <p className={styles.nextRepair}>🔧 {nextAppt.repairType}</p>}
+                                    {nextAppt.vehicleBrand && <p className={styles.nextRepair}>🚗 {nextAppt.vehicleBrand} {nextAppt.vehicleModel}</p>}
+                                </div>
+                            ) : (
+                                <p className={styles.noNext}>No tenés turnos programados.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Historial */}
+                    <div className={styles.widget}>
+                        <div className={styles.widgetHeader}>
+                            <span className={styles.widgetTitle}>🗂 Historial reciente</span>
+                        </div>
+                        <div className={styles.widgetBody}>
+                            {miniHistory.length > 0 ? (
+                                <ul className={styles.historyList}>
+                                    {miniHistory.map(a => (
+                                        <li key={a.id} className={styles.historyItem}>
+                                            <span className={styles.historyDate}>{fmtDate(a.date)}</span>
+                                            <span className={styles.historyTime}>{a.time}</span>
+                                            <span className={`${styles.badge} ${a.status === "active" ? styles.badgeActive : styles.badgeCancelled}`}>
+                                                {a.status === "active" ? "Activo" : "Cancelado"}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className={styles.noNext}>No hay turnos en tu historial.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Calendario */}
+                    <div className={styles.widget}>
+                        <div className={styles.widgetHeader}>
+                            <span className={styles.widgetTitle}>📅 Calendario</span>
+                        </div>
+                        <div className={styles.widgetBody}>
+                            <div className={styles.calendarWrapper}>
+                                <Calendar
+                                    onChange={setSelectedDate}
+                                    value={selectedDate}
+                                    tileContent={({ date, view }) => {
+                                        if (view !== "month") return null;
+                                        const has = allAppointments.some(a => {
+                                            const d = adjustDate(a.date);
+                                            return d.getFullYear() === date.getFullYear() &&
+                                                   d.getMonth() === date.getMonth() &&
+                                                   d.getDate() === date.getDate();
+                                        });
+                                        return has ? <div className={styles.turnoIndicator} /> : null;
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Turnos del día */}
+                    <div className={styles.widget}>
+                        <div className={styles.widgetHeader}>
+                            <span className={styles.widgetTitle}>
+                                🗓 {selectedDate.toLocaleDateString("es-AR", { day: "numeric", month: "long" })}
+                            </span>
+                        </div>
+                        <div className={styles.widgetBody}>
+                            {dailyAppts.length > 0 ? (
+                                <ul className={styles.dayList}>
+                                    {dailyAppts.map(a => (
+                                        <li key={a.id} className={styles.dayItem}>
+                                            <span>{a.time}</span>
+                                            <span>{a.repairType || "Turno"}</span>
+                                            <span className={`${styles.badge} ${a.status === "active" ? styles.badgeActive : styles.badgeCancelled}`}>
+                                                {a.status === "active" ? "Activo" : "Cancelado"}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className={styles.noDay}>Sin turnos para este día.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default Home;
